@@ -237,22 +237,23 @@ footer{
     </div>
   </section>
 
-  <p class="note" id="note1">各トラックの対応形式は WAV / MP3 のみ、1ファイル20MBまで・30秒以内、1トラックにつき1ファイルまでです。DRUM/BASS/MELODY/FXの4トラックすべてに音源を入れると「作成する」が押せるようになります。「曲の長さ」で選んだ秒数になるよう各セクションの小節数を、選んだ「曲の構成」内で自動調整しますが、小節は整数単位のためBPMによって数秒の誤差が出ます。</p>
-  <p class="note" id="note2">ダウンロードはWAV（無劣化）とMP3（192kbps）から選べます。MP3変換はブラウザ内で完結しますが、変換用ライブラリ（lamejs）を外部CDNから読み込むため、そこだけはインターネット接続が必要です。それ以外の処理（解析・生成・WAV書き出し）は完全にオフラインで動作します。</p>
-  <p class="note" id="note3">各素材のテンポは波形から自動で解析し、上のメインBPMに合わせてピッチを保ったまま自動でタイムストレッチします。ドラム/ベースのようなリズムがはっきりした素材は精度良く検出できますが、メロディ/FXのような持続音は検出が不安定なため、検出の信頼度が低い場合は補正せずそのまま使います。まれに実際の半分/倍のBPMとして誤検出することもあります。</p>
-  <p class="note" id="note4">対応BPM範囲は 40〜300 です。40〜200の間は高精度（誤差0.1〜2BPM程度）ですが、200を超えると徐々に誤差が広がり、300付近では誤差4BPM（約1.3%）ほど出ることがあります。テンポが速い曲を作る場合は、この程度のズレが起こり得る前提で聴感で微調整してください。</p>
-  <p class="note" id="note5">単発の音（ワンショット）を入れた場合は自動で判定し、ループさせる代わりに1拍ごとに打ち直します（DRUM/BASS/MELODY）。FXのワンショットは、各セクションの最初の1拍目で1回だけ鳴らします。</p>
-  <p class="note" id="note6">音の重なりによる音割れを防ぐため、最終段に簡易マスターリミッター（DynamicsCompressorNode、閾値-3dB・レシオ20:1）を掛けています。トラックごとの音量フェーダーは、この手前で各レイヤーのゲインに直接掛け算されます。</p>
-  <p class="note" id="note7">サイドチェインは、実際のキックの波形を検知しているわけではなく、メインBPMから計算した拍のタイミングに合わせて機械的にダッキングをかける簡易的な方式です。</p>
-  <p class="note" id="note8">
+  <p class="note" id="note1">各トラックの対応形式は WAV / MP3 のみ、1ファイル20MBまで・30秒以内、1トラックにつき1ファイルまでです。DRUM/BASS/MELODY/FXの4トラックすべてに音源を入れると「作成する」が押せるようになります。</p>
+  <p class="note" id="note2">拍子は4/4固定です（1小節＝4拍）。各セクションの小節数は、選んだ「曲の構成」内の比率を保ちつつ「曲の長さ」に近づくよう自動調整されますが、音楽的な自然さを優先して4小節単位に設定しているため、完成した曲の長さは選んだ秒数とズレます。曲の長さが短い場合や区間数が多いパターンでは、各セクションが最低4小節（さらに条件が重なると2小節、1小節）まで圧縮されることがあり、これが誤差の主な原因です。BPM 100〜180程度では誤差は数%〜10%程度ですが、遅いBPM（40〜60程度）・短い曲の長さ（30〜60秒程度）・区間数の多い構成（3ドロップなど）が重なると、誤差はもっと大きくなることがあります（完成した曲の長さが選んだ秒数の2〜3倍になるケースも確認しています）。</p>
+  <p class="note" id="note3">ダウンロードはWAV（無劣化）とMP3（192kbps）から選べます。MP3変換はブラウザ内で完結しますが、変換用ライブラリ（lamejs）を外部CDNから読み込むため、そこだけはインターネット接続が必要です。それ以外の処理（解析・生成・WAV書き出し）は完全にオフラインで動作します。</p>
+  <p class="note" id="note4">各素材のテンポは波形から自動で解析し、上のメインBPMに合わせてピッチを保ったまま自動でタイムストレッチします。ドラム/ベースのようなリズムがはっきりした素材は精度良く検出できますが、メロディ/FXのような持続音は検出が不安定なため、検出の信頼度が低い場合は補正せずそのまま使います。まれに実際の半分/倍のBPMとして誤検出することもあります。</p>
+  <p class="note" id="note5">対応BPM範囲は 40〜300 です。40〜200の間は高精度（誤差0.1〜2BPM程度）ですが、200を超えると徐々に誤差が広がり、300付近では誤差4BPM（約1.3%）ほど出ることがあります。テンポが速い曲を作る場合は、この程度のズレが起こり得る前提で聴感で微調整してください。</p>
+  <p class="note" id="note6">単発の音（ワンショット）を入れた場合は自動で判定し、ループさせる代わりに1拍ごとに打ち直します（DRUM/BASS/MELODY）。FXのワンショットは、各セクションの最初の1拍目で1回だけ鳴らします。</p>
+  <p class="note" id="note7">音の重なりによる音割れを防ぐため、最終段に簡易マスターリミッター（DynamicsCompressorNode、閾値-3dB・レシオ20:1）を掛けています。トラックごとの音量フェーダーは、この手前で各レイヤーのゲインに直接掛け算されます。</p>
+  <p class="note" id="note8">サイドチェインは、実際のキックの波形を検知しているわけではなく、メインBPMから計算した拍のタイミングに合わせて機械的にダッキングをかける簡易的な方式です。</p>
+  <p class="note" id="note9">
     <strong style="color:var(--text);">曲の構成パターンについて</strong><br><br>
     <strong style="color:var(--text);">2ドロップ</strong>：intro（FXのみ）→ buildup（BASS+FX）→ drop（全トラック）→ break（MELODY+FX）→ buildup（BASS+FX）→ drop（全トラック）→ outro（FXのみ）の7区間。「溜めて→本編→一旦引いて→溜め直して→本編」という、EDMやトランスなどの典型的な展開。ドロップが2回あるので起伏はほどほど。<br><br>
     <strong style="color:var(--text);">ロングビルド</strong>：intro（FXのみ）→ buildup（BASS+FX）→ drop（全トラック）→ outro（FXのみ）の4区間だけ。ブレイクや2回目のドロップを作らず、じっくり長く溜めて、長いドロップを1回鳴らす構成。<br><br>
     <strong style="color:var(--text);">ノンストップ</strong>：区間分けをせず、最初から最後まで全4トラック（DRUM+BASS+MELODY+FX）が鳴り続ける構成。ループのように使いたい場合や長い曲の素材が欲しい場合など。<br><br>
-    <strong style="color:var(--text);">3ドロップ</strong>：intro（FXのみ）→ [buildup（BASS+FX）→ drop（全トラック）→ break（MELODY+FX）] を3セット → outro（FXのみ）、一番区間数が多い構成（10区間）。起伏が多く、区間数が多い分、1区間あたりは短めになります。30秒に設定すると、buildupやbreakなど一部区間が最低保証の1小節（BPMによっては1秒未満）まで縮み、展開がかなり忙しくなります。短い尺で使う場合は「2ドロップ」や「ノンストップ」の方が向いています。<br><br>
+    <strong style="color:var(--text);">3ドロップ</strong>：intro（FXのみ）→ [buildup（BASS+FX）→ drop（全トラック）→ break（MELODY+FX）] を3セット → outro（FXのみ）、一番区間数が多い構成（10区間）。起伏が多く、区間数が多い分、1区間あたりは短めになります。<br><br>
     <strong style="color:var(--text);">バース/コーラス</strong>：intro（FXのみ）→ verse（DRUM+BASS）→ chorus（全トラック）→ verse（DRUM+BASS）→ chorus（全トラック）→ bridge（MELODY+FX）→ chorus（全トラック）→ outro（FXのみ）の8区間。ロック/ポップス寄りの、Aメロ→サビの展開を意識した構成です。<br><br>
     <strong style="color:var(--text);">バース/フック</strong>：intro（FXのみ）→ verse（DRUM+BASS）→ hook（全トラック）→ verse（DRUM+BASS）→ hook（全トラック）→ verse（DRUM+BASS）→ hook（全トラック）の7区間。専用のアウトロやブリッジは無く、最後のhookで終わります。ヒップホップのように、大きな展開の起伏よりループを軸にフックが交互に来る感覚を想定しています。<br><br>
-    <u>バース/コーラス・バース/フックのどちらも、DRUMには単発のワンショットではなく、キック+スネアなどが最初から組まれた「1小節分のループ素材」を入れてください。</u>今のワンショット機能は「1拍ごとに同じ音を打ち直す」仕組みなので、4つ打ち（毎拍同じキック）には対応できますが、キックとスネアが別々に鳴る8ビート的なパターンは作れません。
+    <u>8ビートや16ビートなどを作りたい場合は、DRUMには単発のワンショットではなく、キック+スネアなどが最初から組まれたループ素材を入れてください。</u>今のワンショット機能は「1拍ごとに同じ音を打ち直す」仕組みなので、4つ打ち（毎拍同じキック）には対応できますが、キックとスネアが別々に鳴るようなパターンは作れません。
   </p>
 
   <footer>© 2026 LOOP ARRANGER / Eclipse Ai Studio</footer>
@@ -363,22 +364,23 @@ const TRANSLATIONS = {
     waveformError: '波形を表示できませんでした',
     checkingLabel: '確認中...',
     completedNamePrefix: (name) => `— ${name}`,
-    note1: '各トラックの対応形式は WAV / MP3 のみ、1ファイル20MBまで・30秒以内、1トラックにつき1ファイルまでです。DRUM/BASS/MELODY/FXの4トラックすべてに音源を入れると「作成する」が押せるようになります。「曲の長さ」で選んだ秒数になるよう各セクションの小節数を、選んだ「曲の構成」内で自動調整しますが、小節は整数単位のためBPMによって数秒の誤差が出ます。',
-    note2: 'ダウンロードはWAV（無劣化）とMP3（192kbps）から選べます。MP3変換はブラウザ内で完結しますが、変換用ライブラリ（lamejs）を外部CDNから読み込むため、そこだけはインターネット接続が必要です。それ以外の処理（解析・生成・WAV書き出し）は完全にオフラインで動作します。',
-    note3: '各素材のテンポは波形から自動で解析し、上のメインBPMに合わせてピッチを保ったまま自動でタイムストレッチします。ドラム/ベースのようなリズムがはっきりした素材は精度良く検出できますが、メロディ/FXのような持続音は検出が不安定なため、検出の信頼度が低い場合は補正せずそのまま使います。まれに実際の半分/倍のBPMとして誤検出することもあります。',
-    note4: '対応BPM範囲は 40〜300 です。40〜200の間は高精度（誤差0.1〜2BPM程度）ですが、200を超えると徐々に誤差が広がり、300付近では誤差4BPM（約1.3%）ほど出ることがあります。テンポが速い曲を作る場合は、この程度のズレが起こり得る前提で聴感で微調整してください。',
-    note5: '単発の音（ワンショット）を入れた場合は自動で判定し、ループさせる代わりに1拍ごとに打ち直します（DRUM/BASS/MELODY）。FXのワンショットは、各セクションの最初の1拍目で1回だけ鳴らします。',
-    note6: '音の重なりによる音割れを防ぐため、最終段に簡易マスターリミッター（DynamicsCompressorNode、閾値-3dB・レシオ20:1）を掛けています。トラックごとの音量フェーダーは、この手前で各レイヤーのゲインに直接掛け算されます。',
-    note7: 'サイドチェインは、実際のキックの波形を検知しているわけではなく、メインBPMから計算した拍のタイミングに合わせて機械的にダッキングをかける簡易的な方式です。',
-    note8: `
+    note1: '各トラックの対応形式は WAV / MP3 のみ、1ファイル20MBまで・30秒以内、1トラックにつき1ファイルまでです。DRUM/BASS/MELODY/FXの4トラックすべてに音源を入れると「作成する」が押せるようになります。',
+    note2: '拍子は4/4固定です（1小節＝4拍）。各セクションの小節数は、選んだ「曲の構成」内の比率を保ちつつ「曲の長さ」に近づくよう自動調整されますが、音楽的な自然さを優先して4小節単位に設定しているため、完成した曲の長さは選んだ秒数とズレます。曲の長さが短い場合や区間数が多いパターンでは、各セクションが最低4小節（さらに条件が重なると2小節、1小節）まで圧縮されることがあり、これが誤差の主な原因です。BPM 100〜180程度では誤差は数%〜10%程度ですが、遅いBPM（40〜60程度）・短い曲の長さ（30〜60秒程度）・区間数の多い構成（3ドロップなど）が重なると、誤差はもっと大きくなることがあります（完成した曲の長さが選んだ秒数の2〜3倍になるケースも確認しています）。',
+    note3: 'ダウンロードはWAV（無劣化）とMP3（192kbps）から選べます。MP3変換はブラウザ内で完結しますが、変換用ライブラリ（lamejs）を外部CDNから読み込むため、そこだけはインターネット接続が必要です。それ以外の処理（解析・生成・WAV書き出し）は完全にオフラインで動作します。',
+    note4: '各素材のテンポは波形から自動で解析し、上のメインBPMに合わせてピッチを保ったまま自動でタイムストレッチします。ドラム/ベースのようなリズムがはっきりした素材は精度良く検出できますが、メロディ/FXのような持続音は検出が不安定なため、検出の信頼度が低い場合は補正せずそのまま使います。まれに実際の半分/倍のBPMとして誤検出することもあります。',
+    note5: '対応BPM範囲は 40〜300 です。40〜200の間は高精度（誤差0.1〜2BPM程度）ですが、200を超えると徐々に誤差が広がり、300付近では誤差4BPM（約1.3%）ほど出ることがあります。テンポが速い曲を作る場合は、この程度のズレが起こり得る前提で聴感で微調整してください。',
+    note6: '単発の音（ワンショット）を入れた場合は自動で判定し、ループさせる代わりに1拍ごとに打ち直します（DRUM/BASS/MELODY）。FXのワンショットは、各セクションの最初の1拍目で1回だけ鳴らします。',
+    note7: '音の重なりによる音割れを防ぐため、最終段に簡易マスターリミッター（DynamicsCompressorNode、閾値-3dB・レシオ20:1）を掛けています。トラックごとの音量フェーダーは、この手前で各レイヤーのゲインに直接掛け算されます。',
+    note8: 'サイドチェインは、実際のキックの波形を検知しているわけではなく、メインBPMから計算した拍のタイミングに合わせて機械的にダッキングをかける簡易的な方式です。',
+    note9: `
       <strong style="color:var(--text);">曲の構成パターンについて</strong><br><br>
       <strong style="color:var(--text);">2ドロップ</strong>：intro（FXのみ）→ buildup（BASS+FX）→ drop（全トラック）→ break（MELODY+FX）→ buildup（BASS+FX）→ drop（全トラック）→ outro（FXのみ）の7区間。「溜めて→本編→一旦引いて→溜め直して→本編」という、EDMやトランスなどの典型的な展開。ドロップが2回あるので起伏はほどほど。<br><br>
       <strong style="color:var(--text);">ロングビルド</strong>：intro（FXのみ）→ buildup（BASS+FX）→ drop（全トラック）→ outro（FXのみ）の4区間だけ。ブレイクや2回目のドロップを作らず、じっくり長く溜めて、長いドロップを1回鳴らす構成。<br><br>
       <strong style="color:var(--text);">ノンストップ</strong>：区間分けをせず、最初から最後まで全4トラック（DRUM+BASS+MELODY+FX）が鳴り続ける構成。ループのように使いたい場合や長い曲の素材が欲しい場合など。<br><br>
-      <strong style="color:var(--text);">3ドロップ</strong>：intro（FXのみ）→ [buildup（BASS+FX）→ drop（全トラック）→ break（MELODY+FX）] を3セット → outro（FXのみ）、一番区間数が多い構成（10区間）。起伏が多く、尺も長くなりがちなので、「曲の長さ」を180秒にしても1区間あたりは短めになります。30秒に設定すると、buildupやbreakなど一部区間が最低保証の1小節（BPMによっては1秒未満）まで縮み、展開がかなり忙しくなります。短い尺で使う場合は「2ドロップ」や「ノンストップ」の方が向いています。<br><br>
+      <strong style="color:var(--text);">3ドロップ</strong>：intro（FXのみ）→ [buildup（BASS+FX）→ drop（全トラック）→ break（MELODY+FX）] を3セット → outro（FXのみ）、一番区間数が多い構成（10区間）。起伏が多く、区間数が多い分、1区間あたりは短めになります。<br><br>
       <strong style="color:var(--text);">バース/コーラス</strong>：intro（FXのみ）→ verse（DRUM+BASS）→ chorus（全トラック）→ verse（DRUM+BASS）→ chorus（全トラック）→ bridge（MELODY+FX）→ chorus（全トラック）→ outro（FXのみ）の8区間。ロック/ポップス寄りの、Aメロ→サビの展開を意識した構成です。<br><br>
-      <strong style="color:var(--text);">バース/フック</strong>：verse（DRUM+BASS）→ hook（全トラック）を3セット繰り返すだけの構成（イントロはFXのみ4小節と短め、専用のアウトロやブリッジは無し）。ヒップホップのように、大きな展開の起伏よりループを軸にフックが交互に来る感覚を想定しています。<br><br>
-      <u>バース/コーラス・バース/フックのどちらも、DRUMには単発のワンショットではなく、キック+スネアなどが最初から組まれた「1小節分のループ素材」を入れてください。</u>今のワンショット機能は「1拍ごとに同じ音を打ち直す」仕組みなので、4つ打ち（毎拍同じキック）には対応できますが、キックとスネアが別々に鳴る8ビート的なパターンは作れません。
+      <strong style="color:var(--text);">バース/フック</strong>：intro（FXのみ）→ verse（DRUM+BASS）→ hook（全トラック）→ verse（DRUM+BASS）→ hook（全トラック）→ verse（DRUM+BASS）→ hook（全トラック）の7区間。専用のアウトロやブリッジは無く、最後のhookで終わります。ヒップホップのように、大きな展開の起伏よりループを軸にフックが交互に来る感覚を想定しています。<br><br>
+      <u>8ビートや16ビートなどを作りたい場合は、DRUMには単発のワンショットではなく、キック+スネアなどが最初から組まれたループ素材を入れてください。</u>今のワンショット機能は「1拍ごとに同じ音を打ち直す」仕組みなので、4つ打ち（毎拍同じキック）には対応できますが、キックとスネアが別々に鳴るようなパターンは作れません。
     `,
     warnExt: '対応形式外：wav/mp3のみ',
     warnSize: '20MB超',
@@ -400,6 +402,7 @@ const TRANSLATIONS = {
     errNoTracks: 'どのトラックにも音源が入っていません。最低1つは入れてください。',
     errAllDecodeFailed: 'すべての音源のデコードに失敗しました。ファイル形式（WAV/MP3）や破損がないかご確認ください。',
     logTarget: (target, actual, bpm) => `目標: ${target}秒 / 実際: 約${actual}秒（${bpm}BPM換算で誤差あり）`,
+    logMinBarsReduced: (from, to) => `[調整] BPMが低く区間数も多いため、最低保証の小節数を${from}小節→${to}小節に縮めました（極端に長くなるのを防ぐため）`,
     logSection: (name, bars, dur, silent) => `[${name}] ${bars}小節 / ${dur}秒${silent}`,
     silentTag: '（無音）',
     logRendering: 'レンダリング中...',
@@ -430,22 +433,23 @@ const TRANSLATIONS = {
     waveformError: "Couldn't render waveform",
     checkingLabel: 'Checking...',
     completedNamePrefix: (name) => `— ${name}`,
-    note1: 'Each track accepts WAV / MP3 only, up to 20MB and 30 seconds, one file per track. "Generate" unlocks once all 4 tracks (DRUM/BASS/MELODY/FX) have a file. Section bar counts are auto-scaled within the chosen "Structure" to hit the selected "Length", but since bars are whole numbers the actual length can be off by a few seconds depending on BPM.',
-    note2: 'Download as WAV (lossless) or MP3 (192kbps). MP3 conversion runs in the browser but loads the encoder library (lamejs) from an external CDN, so that part needs an internet connection. Everything else (analysis, generation, WAV export) works fully offline.',
-    note3: "Each track's tempo is auto-analyzed from its waveform and time-stretched (pitch preserved) to match the main BPM above. Rhythmic material like drums/bass detects reliably; sustained material like melody/FX is less reliable, so low-confidence detections are left uncorrected. Occasionally it may detect half/double the true BPM.",
-    note4: 'Supported BPM range is 40–300. 40–200 is high accuracy (±0.1–2 BPM), but accuracy gradually drops above 200, reaching roughly ±4 BPM (about 1.3%) near 300. For fast tracks, expect this level of drift and fine-tune by ear.',
-    note5: 'A one-shot sound is auto-detected and, instead of looping, retriggered every beat (DRUM/BASS/MELODY). One-shot FX plays once on the first beat of each section.',
-    note6: 'A light master limiter (DynamicsCompressorNode, threshold -3dB, ratio 20:1) sits at the very end to prevent clipping when tracks stack up. Per-track volume faders multiply each layer\'s gain before that.',
-    note7: "Sidechain doesn't actually detect the kick's waveform — it applies mechanical ducking synced to beat timing calculated from the main BPM.",
-    note8: `
+    note1: 'Each track accepts WAV / MP3 only, up to 20MB and 30 seconds, one file per track. "Generate" unlocks once all 4 tracks (DRUM/BASS/MELODY/FX) have a file.',
+    note2: 'The time signature is fixed at 4/4 (1 bar = 4 beats). Each section\'s bar count keeps the chosen "Structure"\'s ratios and aims for the selected "Length", but is rounded to a 4-bar unit to keep phrases musically natural, so the actual length drifts from what you picked. When the selected length is short or the structure has many sections, sections can get compressed down to a 4-bar minimum (and further, to 2 or even 1 bar, when conditions stack up) — this is the main source of the drift. At typical BPMs (roughly 100-180) the gap is usually a few percent to around 10%, but a low BPM (roughly 40-60), a short "Length" (roughly 30-60s), and a many-section structure (like Triple Drop) together can push it much further — we\'ve seen the actual length run 2-3x the selected value in those cases.',
+    note3: 'Download as WAV (lossless) or MP3 (192kbps). MP3 conversion runs in the browser but loads the encoder library (lamejs) from an external CDN, so that part needs an internet connection. Everything else (analysis, generation, WAV export) works fully offline.',
+    note4: "Each track's tempo is auto-analyzed from its waveform and time-stretched (pitch preserved) to match the main BPM above. Rhythmic material like drums/bass detects reliably; sustained material like melody/FX is less reliable, so low-confidence detections are left uncorrected. Occasionally it may detect half/double the true BPM.",
+    note5: 'Supported BPM range is 40–300. 40–200 is high accuracy (±0.1–2 BPM), but accuracy gradually drops above 200, reaching roughly ±4 BPM (about 1.3%) near 300. For fast tracks, expect this level of drift and fine-tune by ear.',
+    note6: 'A one-shot sound is auto-detected and, instead of looping, retriggered every beat (DRUM/BASS/MELODY). One-shot FX plays once on the first beat of each section.',
+    note7: 'A light master limiter (DynamicsCompressorNode, threshold -3dB, ratio 20:1) sits at the very end to prevent clipping when tracks stack up. Per-track volume faders multiply each layer\'s gain before that.',
+    note8: "Sidechain doesn't actually detect the kick's waveform — it applies mechanical ducking synced to beat timing calculated from the main BPM.",
+    note9: `
       <strong style="color:var(--text);">About the structure patterns</strong><br><br>
       <strong style="color:var(--text);">Two Drop</strong>: intro (FX only) → buildup (BASS+FX) → drop (all tracks) → break (MELODY+FX) → buildup (BASS+FX) → drop (all tracks) → outro (FX only), 7 sections. A typical arc — build, payoff, pull back, rebuild, payoff again. Two drops keep the ups and downs moderate.<br><br>
       <strong style="color:var(--text);">Long Build</strong>: intro (FX only) → buildup (BASS+FX) → drop (all tracks) → outro (FX only), just 4 sections. No break or second drop — one long build into one long drop.<br><br>
       <strong style="color:var(--text);">Nonstop</strong>: no section breaks at all — all 4 tracks (DRUM+BASS+MELODY+FX) play from start to finish. Good for loop-style use or when you just want a long piece of material.<br><br>
-      <strong style="color:var(--text);">Triple Drop</strong>: intro (FX only) → [buildup (BASS+FX) → drop (all tracks) → break (MELODY+FX)] ×3 → outro (FX only) — the most sections (10). Lots of ups and downs, and it tends to run long, so even at 180 seconds each section stays fairly short. At 30 seconds, some sections (buildup/break) shrink to the 1-bar minimum — sometimes under a second depending on BPM — making the arrangement feel very rushed. For short lengths, "Two Drop" or "Nonstop" work better.<br><br>
+      <strong style="color:var(--text);">Triple Drop</strong>: intro (FX only) → [buildup (BASS+FX) → drop (all tracks) → break (MELODY+FX)] ×3 → outro (FX only) — the most sections (10). Lots of ups and downs, and it tends to run long, so even at 180 seconds each section stays fairly short.<br><br>
       <strong style="color:var(--text);">Verse-Chorus</strong>: intro (FX only) → verse (DRUM+BASS) → chorus (all tracks) → verse (DRUM+BASS) → chorus (all tracks) → bridge (MELODY+FX) → chorus (all tracks) → outro (FX only), 8 sections. Built around a verse→chorus arc more familiar from rock/pop than EDM's build/drop.<br><br>
-      <strong style="color:var(--text);">Verse-Hook</strong>: just verse (DRUM+BASS) → hook (all tracks), repeated 3 times (a short 4-bar FX-only intro, no dedicated outro or bridge). Modeled more on hip-hop, where the loop carries the track and the hook rotates in and out rather than a big EDM-style arc.<br><br>
-      <u>For both Verse-Chorus and Verse-Hook, use a one-bar drum loop for DRUM (kick + snare etc. already arranged) rather than a single one-shot.</u> The one-shot feature retriggers the same sound every beat, which works for four-on-the-floor kicks but can't produce a real backbeat pattern with separate kick and snare hits.
+      <strong style="color:var(--text);">Verse-Hook</strong>: intro (FX only) → verse (DRUM+BASS) → hook (all tracks) → verse (DRUM+BASS) → hook (all tracks) → verse (DRUM+BASS) → hook (all tracks), 7 sections. No dedicated outro or bridge — it ends on the last hook. Modeled more on hip-hop, where the loop carries the track and the hook rotates in and out rather than a big EDM-style arc.<br><br>
+      <u>If you're going for an 8-beat or 16-beat feel, use a drum loop for DRUM (kick + snare etc. already arranged) rather than a single one-shot.</u> The one-shot feature retriggers the same sound every beat, which works for four-on-the-floor kicks but can't produce a real backbeat pattern with separate kick and snare hits.
     `,
     warnExt: 'unsupported format (wav/mp3 only)',
     warnSize: 'over 20MB',
@@ -467,6 +471,7 @@ const TRANSLATIONS = {
     errNoTracks: 'No track has a source loaded. Add at least one.',
     errAllDecodeFailed: 'All sources failed to decode. Please check the file format (WAV/MP3) or whether the files are corrupted.',
     logTarget: (target, actual, bpm) => `Target: ${target}s / Actual: about ${actual}s (due to bar rounding at ${bpm} BPM)`,
+    logMinBarsReduced: (from, to) => `[Adjusted] Low BPM plus many sections would run far too long, so the minimum bar unit was reduced from ${from} to ${to} bars to keep it closer to your target.`,
     logSection: (name, bars, dur, silent) => `[${name}] ${bars} bars / ${dur}s${silent}`,
     silentTag: ' (silent)',
     logRendering: 'Rendering...',
@@ -494,7 +499,7 @@ function applyLanguage(lang){
   document.getElementById('labelSidechain').textContent = t('labelSidechain');
   document.getElementById('labelDownloadFormat').textContent = t('labelDownloadFormat');
   downloadBtn.textContent = t('downloadBtnDefault');
-  for (let i = 1; i <= 8; i++){
+  for (let i = 1; i <= 9; i++){
     const el = document.getElementById('note' + i);
     if (el) el.innerHTML = t('note' + i);
   }
@@ -922,6 +927,7 @@ async function decodeFiles(ctx, files){
 
 async function buildTrack(bpm, targetSeconds, sidechainOn, patternKey){
   const SECTIONS = (PATTERNS[patternKey] || PATTERNS.classic).sections;
+  const MIN_BARS = (PATTERNS[patternKey] || PATTERNS.classic).minBars || 4;
   const probeCtx = new (window.AudioContext || window.webkitAudioContext)();
   const decoded = {};
   const availableCats = CATEGORIES.filter(cat => store[cat.key].length > 0);
@@ -973,16 +979,25 @@ async function buildTrack(bpm, targetSeconds, sidechainOn, patternKey){
 
   const secPerBar = 4 * 60 / bpm;
 
-  // 各セクションの「元の比率」を保ったまま、狙った秒数に合う小節数へスケーリングする
-  // (小節は整数なので、BPMによっては数秒の誤差が出る)
+  // 各セクションの「元の比率」を保ったまま、狙った秒数に近い小節数へスケーリングする。
+  // 音楽的な自然さを優先し、各区間はパターンごとのMIN_BARS単位（通常4小節、区間数の多いパターンは2小節）に丸める。
+  // ただし、遅いBPM×多い区間数だと「最低保証の小節数」だけで狙った秒数を大幅に超えてしまうことがあるため、
+  // その場合は丸め単位を自動的に縮める（4→2→1小節）安全策を入れている。
   const totalWeight = SECTIONS.reduce((s, sec) => s + sec.bars, 0);
   let targetBars = Math.max(SECTIONS.length, Math.round(targetSeconds / secPerBar));
-  let scaledBars = SECTIONS.map(sec => Math.max(1, Math.round(targetBars * sec.bars / totalWeight)));
-  let diff = targetBars - scaledBars.reduce((a, b) => a + b, 0);
-  if (diff !== 0){
-    const idx = scaledBars.indexOf(Math.max(...scaledBars));
-    scaledBars[idx] = Math.max(1, scaledBars[idx] + diff);
+
+  let effectiveMinBars = MIN_BARS;
+  while (effectiveMinBars > 1 && SECTIONS.length * effectiveMinBars * secPerBar > targetSeconds * 1.5){
+    effectiveMinBars = effectiveMinBars === 4 ? 2 : 1;
   }
+  if (effectiveMinBars < MIN_BARS){
+    log(t('logMinBarsReduced', MIN_BARS, effectiveMinBars));
+  }
+
+  let scaledBars = SECTIONS.map(sec => {
+    const raw = targetBars * sec.bars / totalWeight;
+    return Math.max(effectiveMinBars, Math.round(raw / effectiveMinBars) * effectiveMinBars);
+  });
 
   let totalSec = 0;
   const plan = SECTIONS.map((sec, i) => {
