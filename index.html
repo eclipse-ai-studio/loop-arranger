@@ -1,0 +1,1286 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LOOP ARRANGER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0c0e;
+  --panel:#141519;
+  --line:#2a2c31;
+  --text:#e8e9eb;
+  --dim:#8a8d93;
+  --acid:#c6ff3a;
+  --violet:#8a5cff;
+  --danger:#ff5c5c;
+  --font-head:'Space Grotesk', system-ui, sans-serif;
+  --font-mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+:root:not([data-theme="light"]){ }
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f2f2ef; --panel:#ffffff; --line:#d8d8d4; --text:#141519; --dim:#5a5c62;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f2f2ef; --panel:#ffffff; --line:#d8d8d4; --text:#141519; --dim:#5a5c62;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:var(--font-mono); font-size:14px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px; margin:0 auto; padding:48px 20px 96px;}
+header{margin-bottom:40px; border-bottom:1px solid var(--line); padding-bottom:24px;}
+h1{
+  font-family:var(--font-head); font-weight:700; font-size:clamp(28px,5vw,44px);
+  margin:0 0 8px; letter-spacing:-0.02em;
+  text-shadow:0 0 8px rgba(198,255,58,.5), 0 0 26px rgba(198,255,58,.25);
+}
+.tagline{color:var(--dim); max-width:56ch; margin:0;}
+.bar{
+  display:flex; align-items:flex-end; gap:3px; height:28px; margin:20px 0 0;
+}
+.bar span{
+  width:4px; background:var(--acid); border-radius:1px;
+  animation:bounce 1.1s ease-in-out infinite;
+}
+.bar span:nth-child(1){height:40%; animation-delay:0s;}
+.bar span:nth-child(2){height:90%; animation-delay:.1s;}
+.bar span:nth-child(3){height:60%; animation-delay:.2s;}
+.bar span:nth-child(4){height:100%; animation-delay:.3s;}
+.bar span:nth-child(5){height:50%; animation-delay:.4s;}
+.bar span:nth-child(6){height:75%; animation-delay:.5s;}
+.bar span:nth-child(7){height:35%; animation-delay:.6s;}
+.bar span:nth-child(8){height:85%; animation-delay:.7s;}
+@keyframes bounce{0%,100%{transform:scaleY(.4);}50%{transform:scaleY(1);}}
+@media (prefers-reduced-motion: reduce){ .bar span{animation:none;} }
+
+section{margin-bottom:36px;}
+.section-label{
+  font-size:11px; color:var(--acid); text-transform:uppercase; letter-spacing:.08em;
+  margin-bottom:14px; font-family:var(--font-mono);
+}
+.grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+@media (max-width:680px){ .grid{grid-template-columns:repeat(2,1fr);} }
+@media (max-width:400px){ .grid{grid-template-columns:1fr;} }
+
+.slot{
+  border:1px solid var(--line); background:var(--panel); padding:16px;
+  display:flex; flex-direction:column; gap:10px; min-height:150px;
+}
+.slot.has-files{border-color:var(--acid);}
+.slot-name{font-family:var(--font-head); font-weight:700; font-size:15px;}
+.slot-sub{color:var(--dim); font-size:11px;}
+.slot input[type=file]{display:none;}
+.slot label.dropzone{
+  border:1px dashed var(--line); flex:1; display:flex; align-items:center; justify-content:center;
+  text-align:center; padding:10px; cursor:pointer; color:var(--dim); font-size:12px;
+}
+.slot.has-files label.dropzone{border-style:solid; color:var(--text);}
+.filelist{list-style:none; margin:0; padding:0; font-size:11px; color:var(--dim); max-height:70px; overflow-y:auto;}
+.filelist li{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+.controls{
+  display:flex; flex-direction:column; gap:22px;
+}
+.field{display:flex; flex-direction:column; gap:6px;}
+.field label{font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.06em;}
+.field input[type=number]{
+  background:var(--panel); border:1px solid var(--line); color:var(--text);
+  font-family:var(--font-mono); font-size:14px; padding:8px 10px; width:100px;
+}
+.slider-field{ min-width:200px; }
+.slider-row{ display:flex; align-items:center; gap:12px; height:36px; }
+.slider-row input[type=range]{ max-width:320px; }
+.slider-value{
+  font-family:var(--font-head); font-weight:700; font-size:16px; color:var(--acid);
+  min-width:56px; text-align:right;
+}
+input[type=range]{
+  -webkit-appearance:none; appearance:none; flex:1; height:3px;
+  background:var(--line); outline:none; border-radius:0; cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:16px; height:16px;
+  background:var(--acid); border-radius:50%; border:2px solid var(--bg);
+  box-shadow:0 0 0 1px var(--acid); cursor:pointer; margin-top:-1px;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px; height:14px; background:var(--acid); border-radius:50%;
+  border:2px solid var(--bg); box-shadow:0 0 0 1px var(--acid); cursor:pointer;
+}
+input[type=range]::-moz-range-track{ background:var(--line); height:3px; }
+.seg-buttons{ display:flex; gap:8px; flex-wrap:wrap; }
+.seg-btn{
+  font-family:var(--font-mono); font-weight:700; font-size:13px;
+  border:1px solid var(--line); background:transparent; color:var(--text);
+  padding:10px 0; flex:1; cursor:pointer;
+}
+.seg-btn:hover{ border-color:var(--acid); }
+.seg-btn.active{ border-color:var(--acid); background:var(--acid); color:#0b0c0e; }
+.seg-buttons.compact{ gap:6px; }
+.seg-btn.compact{
+  flex:none; padding:6px 16px; font-size:11px; font-weight:500;
+}
+.seg-btn.compact.active{ background:transparent; color:var(--acid); }
+
+button{
+  font-family:var(--font-mono); font-weight:700; font-size:13px;
+  border:1px solid var(--acid); background:transparent; color:var(--acid);
+  padding:12px 22px; cursor:pointer; letter-spacing:.03em;
+}
+button:hover:not(:disabled){background:var(--acid); color:#0b0c0e;}
+button:disabled{opacity:.35; cursor:not-allowed;}
+button.primary{margin-left:auto;}
+button.ghost{border-color:var(--acid); color:var(--acid);}
+button.ghost:hover:not(:disabled){background:var(--acid); color:#0b0c0e;}
+
+.log{
+  background:var(--panel); border:1px solid var(--line); padding:14px;
+  font-size:12px; color:var(--dim); white-space:pre-wrap; max-height:220px; overflow-y:auto;
+  margin-top:20px;
+}
+.result{display:none; gap:14px; flex-direction:column; margin-top:20px;}
+.result.show{display:flex;}
+audio{width:100%;}
+.note{
+  font-size:12px; color:var(--dim); border-left:2px solid var(--violet); padding-left:12px; margin-top:28px;
+}
+footer{
+  margin-top:56px; padding-top:20px; border-top:1px solid var(--line);
+  font-size:11px; color:var(--dim); text-align:center;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div style="display:flex; justify-content:flex-end; gap:6px; margin-bottom:12px;">
+    <button type="button" class="seg-btn compact lang-btn active" data-value="ja" style="max-width:90px;">日本語</button>
+    <button type="button" class="seg-btn compact lang-btn" data-value="en" style="max-width:90px;">English</button>
+  </div>
+  <header>
+    <h1>LOOP ARRANGER</h1>
+    <p class="tagline" id="taglineText">DRUM / BASS / MELODY / FX の4トラックを放り込んで、設定した構成の曲に自動で組み上げる。処理はすべてこのブラウザの中で完結し、ファイルはどこにもアップロードされません。</p>
+    <div class="bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  </header>
+
+  <section>
+    <div class="section-label" id="stepLabel1">01 — 素材を4つ入れる（ループ、ワンショット）</div>
+    <div class="grid" id="slots"></div>
+  </section>
+
+  <section>
+    <div class="section-label" id="stepLabel2">02 — 設定を選んで「作成する」を押す</div>
+    <div class="controls">
+      <div class="field">
+        <label for="trackName" id="labelTrackName">曲名</label>
+        <input type="text" id="trackName" value="loop-arranger-session" maxlength="60"
+          style="background:var(--panel); border:1px solid var(--line); color:var(--text); font-family:var(--font-mono); font-size:14px; padding:8px 10px; width:100%; max-width:320px;">
+      </div>
+      <div class="field slider-field">
+        <label for="bpm">BPM</label>
+        <div class="slider-row">
+          <input type="range" id="bpm" min="40" max="300" value="120" step="1">
+          <span class="slider-value" id="bpmValue">120</span>
+        </div>
+      </div>
+      <div class="field slider-field">
+        <label id="labelDuration">曲の長さ（秒）</label>
+        <div class="slider-row">
+          <input type="range" id="duration" min="30" max="300" value="150" step="1">
+          <span class="slider-value" id="durationValue">150</span>
+        </div>
+      </div>
+      <div class="field">
+        <label id="labelPattern">曲の構成</label>
+        <div class="seg-buttons compact">
+          <button type="button" class="seg-btn compact pattern-btn active" data-value="classic">2ドロップ</button>
+          <button type="button" class="seg-btn compact pattern-btn" data-value="longbuild">ロングビルド</button>
+          <button type="button" class="seg-btn compact pattern-btn" data-value="nonstop">ノンストップ</button>
+          <button type="button" class="seg-btn compact pattern-btn" data-value="tripledrop">3ドロップ</button>
+          <button type="button" class="seg-btn compact pattern-btn" data-value="eightbeat">バース/コーラス</button>
+          <button type="button" class="seg-btn compact pattern-btn" data-value="versehook">バース/フック</button>
+        </div>
+      </div>
+      <div class="field">
+        <label id="labelSidechain">サイドチェイン（DRUMでBASS/MELODY/FXをダッキング）</label>
+        <div class="seg-buttons compact">
+          <button type="button" class="seg-btn compact sidechain-btn active" data-value="off">OFF</button>
+          <button type="button" class="seg-btn compact sidechain-btn" data-value="on">ON</button>
+        </div>
+      </div>
+      <button class="primary" id="generateBtn">作成する</button>
+    </div>
+    <div class="log" id="log">「作成する」を押すと、ここに処理状況が表示され、完成した曲とダウンロードボタンが表示されます。</div>
+  </section>
+
+  <section class="result" id="result">
+    <div class="section-label"><span id="stepLabel3">03 — 完成</span> <span id="completedTrackName"></span></div>
+    <audio id="player" controls></audio>
+    <canvas id="resultWaveform" width="700" height="60" style="display:none; width:100%; height:60px; background:var(--bg); border:1px solid var(--line);"></canvas>
+    <div class="field" style="margin-top:10px;">
+      <label id="labelDownloadFormat">ダウンロード形式</label>
+      <div class="seg-buttons compact" style="max-width:180px;">
+        <button type="button" class="seg-btn compact format-btn active" data-value="wav">WAV</button>
+        <button type="button" class="seg-btn compact format-btn" data-value="mp3">MP3</button>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+      <button class="ghost" id="downloadBtn">ダウンロード</button>
+    </div>
+  </section>
+
+  <p class="note" id="note1">各トラックの対応形式は WAV / MP3 のみ、1ファイル20MBまで・30秒以内、1トラックにつき1ファイルまでです。DRUM/BASS/MELODY/FXの4トラックすべてに音源を入れると「作成する」が押せるようになります。「曲の長さ」で選んだ秒数になるよう各セクションの小節数を、選んだ「曲の構成」内で自動調整しますが、小節は整数単位のためBPMによって数秒の誤差が出ます。</p>
+  <p class="note" id="note2">ダウンロードはWAV（無劣化）とMP3（192kbps）から選べます。MP3変換はブラウザ内で完結しますが、変換用ライブラリ（lamejs）を外部CDNから読み込むため、そこだけはインターネット接続が必要です。それ以外の処理（解析・生成・WAV書き出し）は完全にオフラインで動作します。</p>
+  <p class="note" id="note3">各素材のテンポは波形から自動で解析し、上のメインBPMに合わせてピッチを保ったまま自動でタイムストレッチします。ドラム/ベースのようなリズムがはっきりした素材は精度良く検出できますが、メロディ/FXのような持続音は検出が不安定なため、検出の信頼度が低い場合は補正せずそのまま使います。まれに実際の半分/倍のBPMとして誤検出することもあります。</p>
+  <p class="note" id="note4">対応BPM範囲は 40〜300 です。40〜200の間は高精度（誤差0.1〜2BPM程度）ですが、200を超えると徐々に誤差が広がり、300付近では誤差4BPM（約1.3%）ほど出ることがあります。テンポが速い曲を作る場合は、この程度のズレが起こり得る前提で聴感で微調整してください。</p>
+  <p class="note" id="note5">単発の音（ワンショット）を入れた場合は自動で判定し、ループさせる代わりに1拍ごとに打ち直します（DRUM/BASS/MELODY）。FXのワンショットは、各セクションの最初の1拍目で1回だけ鳴らします。</p>
+  <p class="note" id="note6">音の重なりによる音割れを防ぐため、最終段に簡易マスターリミッター（DynamicsCompressorNode、閾値-3dB・レシオ20:1）を掛けています。トラックごとの音量フェーダーは、この手前で各レイヤーのゲインに直接掛け算されます。</p>
+  <p class="note" id="note7">サイドチェインは、実際のキックの波形を検知しているわけではなく、メインBPMから計算した拍のタイミングに合わせて機械的にダッキングをかける簡易的な方式です。</p>
+  <p class="note" id="note8">
+    <strong style="color:var(--text);">曲の構成パターンについて</strong><br><br>
+    <strong style="color:var(--text);">2ドロップ</strong>：intro（FXのみ）→ buildup（BASS+FX）→ drop（全トラック）→ break（MELODY+FX）→ buildup（BASS+FX）→ drop（全トラック）→ outro（FXのみ）の7区間。「溜めて→本編→一旦引いて→溜め直して→本編」という、EDMやトランスなどの典型的な展開。ドロップが2回あるので起伏はほどほど。<br><br>
+    <strong style="color:var(--text);">ロングビルド</strong>：intro（FXのみ）→ buildup（BASS+FX）→ drop（全トラック）→ outro（FXのみ）の4区間だけ。ブレイクや2回目のドロップを作らず、じっくり長く溜めて、長いドロップを1回鳴らす構成。<br><br>
+    <strong style="color:var(--text);">ノンストップ</strong>：区間分けをせず、最初から最後まで全4トラック（DRUM+BASS+MELODY+FX）が鳴り続ける構成。ループのように使いたい場合や長い曲の素材が欲しい場合など。<br><br>
+    <strong style="color:var(--text);">3ドロップ</strong>：intro（FXのみ）→ [buildup（BASS+FX）→ drop（全トラック）→ break（MELODY+FX）] を3セット → outro（FXのみ）、一番区間数が多い構成（10区間）。起伏が多く、尺も長くなりがちなので、「曲の長さ」を180秒にしても1区間あたりは短めになります。30秒に設定すると、buildupやbreakなど一部区間が最低保証の1小節（BPMによっては1秒未満）まで縮み、展開がかなり忙しくなります。短い尺で使う場合は「2ドロップ」や「ノンストップ」の方が向いています。<br><br>
+    <strong style="color:var(--text);">バース/コーラス</strong>：intro（FXのみ）→ verse（DRUM+BASS）→ chorus（全トラック）→ verse（DRUM+BASS）→ chorus（全トラック）→ bridge（MELODY+FX）→ chorus（全トラック）→ outro（FXのみ）の8区間。ロック/ポップス寄りの、Aメロ→サビの展開を意識した構成です。<br><br>
+    <strong style="color:var(--text);">バース/フック</strong>：verse（DRUM+BASS）→ hook（全トラック）を3セット繰り返すだけの構成（イントロはFXのみ4小節と短め、専用のアウトロやブリッジは無し）。ヒップホップのように、大きな展開の起伏よりループを軸にフックが交互に来る感覚を想定しています。<br><br>
+    <u>バース/コーラス・バース/フックのどちらも、DRUMには単発のワンショットではなく、キック+スネアなどが最初から組まれた「1小節分のループ素材」を入れてください。</u>今のワンショット機能は「1拍ごとに同じ音を打ち直す」仕組みなので、4つ打ち（毎拍同じキック）には対応できますが、キックとスネアが別々に鳴る8ビート的なパターンは作れません。
+  </p>
+
+  <footer>© 2026 LOOP ARRANGER / Eclipse Ai Studio</footer>
+</div>
+
+<script>
+const CATEGORIES = [
+  {key:'drum', label:'DRUM'},
+  {key:'bass', label:'BASS'},
+  {key:'melody', label:'MELODY'},
+  {key:'fx', label:'FX'},
+];
+const PATTERNS = {
+  classic: {
+    label: '2ドロップ',
+    sections: [
+      {name:'intro',    bars:16, categories:['fx']},
+      {name:'buildup1', bars:8,  categories:['bass','fx']},
+      {name:'drop1',    bars:28, categories:['drum','bass','melody','fx']},
+      {name:'break',    bars:12, categories:['melody','fx']},
+      {name:'buildup2', bars:8,  categories:['bass','fx']},
+      {name:'drop2',    bars:28, categories:['drum','bass','melody','fx']},
+      {name:'outro',    bars:12, categories:['fx']},
+    ],
+  },
+  longbuild: {
+    label: 'ロングビルド',
+    sections: [
+      {name:'intro',    bars:20, categories:['fx']},
+      {name:'buildup1', bars:16, categories:['bass','fx']},
+      {name:'drop1',    bars:40, categories:['drum','bass','melody','fx']},
+      {name:'outro',    bars:16, categories:['fx']},
+    ],
+  },
+  nonstop: {
+    label: 'ノンストップ',
+    sections: [
+      {name:'main', bars:64, categories:['drum','bass','melody','fx']},
+    ],
+  },
+  tripledrop: {
+    label: '3ドロップ',
+    sections: [
+      {name:'intro',    bars:12, categories:['fx']},
+      {name:'buildup1', bars:6,  categories:['bass','fx']},
+      {name:'drop1',    bars:20, categories:['drum','bass','melody','fx']},
+      {name:'break1',   bars:8,  categories:['melody','fx']},
+      {name:'buildup2', bars:6,  categories:['bass','fx']},
+      {name:'drop2',    bars:20, categories:['drum','bass','melody','fx']},
+      {name:'break2',   bars:8,  categories:['melody','fx']},
+      {name:'buildup3', bars:6,  categories:['bass','fx']},
+      {name:'drop3',    bars:20, categories:['drum','bass','melody','fx']},
+      {name:'outro',    bars:12, categories:['fx']},
+    ],
+  },
+  eightbeat: {
+    label: 'バース/コーラス',
+    sections: [
+      {name:'intro',   bars:8,  categories:['fx']},
+      {name:'verse1',  bars:16, categories:['drum','bass']},
+      {name:'chorus1', bars:16, categories:['drum','bass','melody','fx']},
+      {name:'verse2',  bars:16, categories:['drum','bass']},
+      {name:'chorus2', bars:16, categories:['drum','bass','melody','fx']},
+      {name:'bridge',  bars:8,  categories:['melody','fx']},
+      {name:'chorus3', bars:16, categories:['drum','bass','melody','fx']},
+      {name:'outro',   bars:8,  categories:['fx']},
+    ],
+  },
+  versehook: {
+    label: 'バース/フック',
+    sections: [
+      {name:'intro', bars:4,  categories:['fx']},
+      {name:'verse1', bars:16, categories:['drum','bass']},
+      {name:'hook1',  bars:16, categories:['drum','bass','melody','fx']},
+      {name:'verse2', bars:16, categories:['drum','bass']},
+      {name:'hook2',  bars:16, categories:['drum','bass','melody','fx']},
+      {name:'verse3', bars:16, categories:['drum','bass']},
+      {name:'hook3',  bars:16, categories:['drum','bass','melody','fx']},
+    ],
+  },
+};
+
+// --- 多言語対応 ---
+let currentLang = 'ja';
+const PATTERN_LABELS = {
+  ja: { classic:'2ドロップ', longbuild:'ロングビルド', nonstop:'ノンストップ', tripledrop:'3ドロップ', eightbeat:'バース/コーラス', versehook:'バース/フック' },
+  en: { classic:'Two Drop', longbuild:'Long Build', nonstop:'Nonstop', tripledrop:'Triple Drop', eightbeat:'Verse-Chorus', versehook:'Verse-Hook' },
+};
+const TRANSLATIONS = {
+  ja: {
+    tagline: 'DRUM / BASS / MELODY / FX の4トラックを放り込んで、設定した構成の曲に自動で組み上げる。処理はすべてこのブラウザの中で完結し、ファイルはどこにもアップロードされません。',
+    stepLabel1: '01 — 素材を4つ入れる（ループ、ワンショット）',
+    stepLabel2: '02 — 設定を選んで「作成する」を押す',
+    stepLabel3: '03 — 完成',
+    labelTrackName: '曲名',
+    labelDuration: '曲の長さ（秒）',
+    labelPattern: '曲の構成',
+    labelSidechain: 'サイドチェイン（DRUMでBASS/MELODY/FXをダッキング）',
+    labelDownloadFormat: 'ダウンロード形式',
+    generateBtnDefault: '作成する',
+    generateBtnMissing: (tracks) => `作成する（あと ${tracks} が必要）`,
+    logPlaceholder: '「作成する」を押すと、ここに処理状況が表示され、完成した曲とダウンロードボタンが表示されます。',
+    downloadBtnDefault: 'ダウンロード',
+    downloadBtnConverting: 'MP3に変換中...',
+    slotSubHtml: 'WAV / MP3<br>（20MBまで・30秒以内）',
+    dzTextHtml: 'ファイルを選択<br>（1ファイルのみ）',
+    slotVolumeLabel: '音量',
+    waveformError: '波形を表示できませんでした',
+    checkingLabel: '確認中...',
+    completedNamePrefix: (name) => `— ${name}`,
+    note1: '各トラックの対応形式は WAV / MP3 のみ、1ファイル20MBまで・30秒以内、1トラックにつき1ファイルまでです。DRUM/BASS/MELODY/FXの4トラックすべてに音源を入れると「作成する」が押せるようになります。「曲の長さ」で選んだ秒数になるよう各セクションの小節数を、選んだ「曲の構成」内で自動調整しますが、小節は整数単位のためBPMによって数秒の誤差が出ます。',
+    note2: 'ダウンロードはWAV（無劣化）とMP3（192kbps）から選べます。MP3変換はブラウザ内で完結しますが、変換用ライブラリ（lamejs）を外部CDNから読み込むため、そこだけはインターネット接続が必要です。それ以外の処理（解析・生成・WAV書き出し）は完全にオフラインで動作します。',
+    note3: '各素材のテンポは波形から自動で解析し、上のメインBPMに合わせてピッチを保ったまま自動でタイムストレッチします。ドラム/ベースのようなリズムがはっきりした素材は精度良く検出できますが、メロディ/FXのような持続音は検出が不安定なため、検出の信頼度が低い場合は補正せずそのまま使います。まれに実際の半分/倍のBPMとして誤検出することもあります。',
+    note4: '対応BPM範囲は 40〜300 です。40〜200の間は高精度（誤差0.1〜2BPM程度）ですが、200を超えると徐々に誤差が広がり、300付近では誤差4BPM（約1.3%）ほど出ることがあります。テンポが速い曲を作る場合は、この程度のズレが起こり得る前提で聴感で微調整してください。',
+    note5: '単発の音（ワンショット）を入れた場合は自動で判定し、ループさせる代わりに1拍ごとに打ち直します（DRUM/BASS/MELODY）。FXのワンショットは、各セクションの最初の1拍目で1回だけ鳴らします。',
+    note6: '音の重なりによる音割れを防ぐため、最終段に簡易マスターリミッター（DynamicsCompressorNode、閾値-3dB・レシオ20:1）を掛けています。トラックごとの音量フェーダーは、この手前で各レイヤーのゲインに直接掛け算されます。',
+    note7: 'サイドチェインは、実際のキックの波形を検知しているわけではなく、メインBPMから計算した拍のタイミングに合わせて機械的にダッキングをかける簡易的な方式です。',
+    note8: `
+      <strong style="color:var(--text);">曲の構成パターンについて</strong><br><br>
+      <strong style="color:var(--text);">2ドロップ</strong>：intro（FXのみ）→ buildup（BASS+FX）→ drop（全トラック）→ break（MELODY+FX）→ buildup（BASS+FX）→ drop（全トラック）→ outro（FXのみ）の7区間。「溜めて→本編→一旦引いて→溜め直して→本編」という、EDMやトランスなどの典型的な展開。ドロップが2回あるので起伏はほどほど。<br><br>
+      <strong style="color:var(--text);">ロングビルド</strong>：intro（FXのみ）→ buildup（BASS+FX）→ drop（全トラック）→ outro（FXのみ）の4区間だけ。ブレイクや2回目のドロップを作らず、じっくり長く溜めて、長いドロップを1回鳴らす構成。<br><br>
+      <strong style="color:var(--text);">ノンストップ</strong>：区間分けをせず、最初から最後まで全4トラック（DRUM+BASS+MELODY+FX）が鳴り続ける構成。ループのように使いたい場合や長い曲の素材が欲しい場合など。<br><br>
+      <strong style="color:var(--text);">3ドロップ</strong>：intro（FXのみ）→ [buildup（BASS+FX）→ drop（全トラック）→ break（MELODY+FX）] を3セット → outro（FXのみ）、一番区間数が多い構成（10区間）。起伏が多く、尺も長くなりがちなので、「曲の長さ」を180秒にしても1区間あたりは短めになります。30秒に設定すると、buildupやbreakなど一部区間が最低保証の1小節（BPMによっては1秒未満）まで縮み、展開がかなり忙しくなります。短い尺で使う場合は「2ドロップ」や「ノンストップ」の方が向いています。<br><br>
+      <strong style="color:var(--text);">バース/コーラス</strong>：intro（FXのみ）→ verse（DRUM+BASS）→ chorus（全トラック）→ verse（DRUM+BASS）→ chorus（全トラック）→ bridge（MELODY+FX）→ chorus（全トラック）→ outro（FXのみ）の8区間。ロック/ポップス寄りの、Aメロ→サビの展開を意識した構成です。<br><br>
+      <strong style="color:var(--text);">バース/フック</strong>：verse（DRUM+BASS）→ hook（全トラック）を3セット繰り返すだけの構成（イントロはFXのみ4小節と短め、専用のアウトロやブリッジは無し）。ヒップホップのように、大きな展開の起伏よりループを軸にフックが交互に来る感覚を想定しています。<br><br>
+      <u>バース/コーラス・バース/フックのどちらも、DRUMには単発のワンショットではなく、キック+スネアなどが最初から組まれた「1小節分のループ素材」を入れてください。</u>今のワンショット機能は「1拍ごとに同じ音を打ち直す」仕組みなので、4つ打ち（毎拍同じキック）には対応できますが、キックとスネアが別々に鳴る8ビート的なパターンは作れません。
+    `,
+    warnExt: '対応形式外：wav/mp3のみ',
+    warnSize: '20MB超',
+    warnDuration: '30秒超',
+    warnCount: (n) => `1トラック最大${n}件まで`,
+    warnPrefix: '除外: ',
+    logPreparing: '準備中...',
+    logDecoding: (label) => `${label}: デコード中...`,
+    logNoDecode: (label) => `  [警告] ${label}: デコードできる音源がありませんでした（このトラックは使用されません）`,
+    logStretchApply: (label, detected, confidence, bpm) => `  ${label}: 検出BPM ${detected}（信頼度${confidence}%）→ ${bpm}に補正中...`,
+    logNoStretch: (label, reason, detected) => `  ${label}: 補正なし（${reason}${detected ? '・検出値'+detected : ''}）`,
+    reasonNoDetect: 'テンポ検出不可',
+    reasonLowConf: (c) => `信頼度低(${c}%)`,
+    reasonSameBpm: 'ほぼ同一BPM',
+    logStretchFail: (label, msg) => `  [警告] ${label}: テンポ解析に失敗したため補正なしで使用します（${msg}）`,
+    logOneShot: (label) => `  ${label}: ワンショットとして検出 → 拍/区間ごとに打ち直します`,
+    logOneShotFail: (label, msg) => `  [警告] ${label}: ワンショット判定に失敗したためループとして扱います（${msg}）`,
+    logSkipped: (labels) => `[スキップ] ${labels} は空のため使用しません`,
+    errNoTracks: 'どのトラックにも音源が入っていません。最低1つは入れてください。',
+    errAllDecodeFailed: 'すべての音源のデコードに失敗しました。ファイル形式（WAV/MP3）や破損がないかご確認ください。',
+    logTarget: (target, actual, bpm) => `目標: ${target}秒 / 実際: 約${actual}秒（${bpm}BPM換算で誤差あり）`,
+    logSection: (name, bars, dur, silent) => `[${name}] ${bars}小節 / ${dur}秒${silent}`,
+    silentTag: '（無音）',
+    logRendering: 'レンダリング中...',
+    logNearSilent: '[警告] 生成された音声がほぼ無音です。アップロードした音源のデコードに失敗している可能性があります。',
+    logToWav: 'WAVに変換中...',
+    logComplete: '完成！再生ボタンで確認できます。',
+    errPrefix: '[エラー] ',
+    downloadErrPrefix: '[ダウンロードエラー] ',
+  },
+  en: {
+    tagline: 'Drop in 4 tracks — DRUM / BASS / MELODY / FX — and it auto-arranges them into a track using the structure you choose. Everything runs in this browser; nothing is ever uploaded anywhere.',
+    stepLabel1: '01 — Add 4 tracks (loops or one-shots)',
+    stepLabel2: '02 — Pick settings, then press "Generate"',
+    stepLabel3: '03 — Done',
+    labelTrackName: 'Track name',
+    labelDuration: 'Length (sec)',
+    labelPattern: 'Structure',
+    labelSidechain: 'Sidechain (ducks BASS/MELODY/FX with DRUM)',
+    labelDownloadFormat: 'Download format',
+    generateBtnDefault: 'Generate',
+    generateBtnMissing: (tracks) => `Generate (need ${tracks})`,
+    logPlaceholder: 'Press "Generate" to see progress here, then the finished track and download button will appear below.',
+    downloadBtnDefault: 'Download',
+    downloadBtnConverting: 'Converting to MP3...',
+    slotSubHtml: 'WAV / MP3<br>(up to 20MB · 30s)',
+    dzTextHtml: 'Choose file<br>(1 file only)',
+    slotVolumeLabel: 'Volume',
+    waveformError: "Couldn't render waveform",
+    checkingLabel: 'Checking...',
+    completedNamePrefix: (name) => `— ${name}`,
+    note1: 'Each track accepts WAV / MP3 only, up to 20MB and 30 seconds, one file per track. "Generate" unlocks once all 4 tracks (DRUM/BASS/MELODY/FX) have a file. Section bar counts are auto-scaled within the chosen "Structure" to hit the selected "Length", but since bars are whole numbers the actual length can be off by a few seconds depending on BPM.',
+    note2: 'Download as WAV (lossless) or MP3 (192kbps). MP3 conversion runs in the browser but loads the encoder library (lamejs) from an external CDN, so that part needs an internet connection. Everything else (analysis, generation, WAV export) works fully offline.',
+    note3: "Each track's tempo is auto-analyzed from its waveform and time-stretched (pitch preserved) to match the main BPM above. Rhythmic material like drums/bass detects reliably; sustained material like melody/FX is less reliable, so low-confidence detections are left uncorrected. Occasionally it may detect half/double the true BPM.",
+    note4: 'Supported BPM range is 40–300. 40–200 is high accuracy (±0.1–2 BPM), but accuracy gradually drops above 200, reaching roughly ±4 BPM (about 1.3%) near 300. For fast tracks, expect this level of drift and fine-tune by ear.',
+    note5: 'A one-shot sound is auto-detected and, instead of looping, retriggered every beat (DRUM/BASS/MELODY). One-shot FX plays once on the first beat of each section.',
+    note6: 'A light master limiter (DynamicsCompressorNode, threshold -3dB, ratio 20:1) sits at the very end to prevent clipping when tracks stack up. Per-track volume faders multiply each layer\'s gain before that.',
+    note7: "Sidechain doesn't actually detect the kick's waveform — it applies mechanical ducking synced to beat timing calculated from the main BPM.",
+    note8: `
+      <strong style="color:var(--text);">About the structure patterns</strong><br><br>
+      <strong style="color:var(--text);">Two Drop</strong>: intro (FX only) → buildup (BASS+FX) → drop (all tracks) → break (MELODY+FX) → buildup (BASS+FX) → drop (all tracks) → outro (FX only), 7 sections. A typical arc — build, payoff, pull back, rebuild, payoff again. Two drops keep the ups and downs moderate.<br><br>
+      <strong style="color:var(--text);">Long Build</strong>: intro (FX only) → buildup (BASS+FX) → drop (all tracks) → outro (FX only), just 4 sections. No break or second drop — one long build into one long drop.<br><br>
+      <strong style="color:var(--text);">Nonstop</strong>: no section breaks at all — all 4 tracks (DRUM+BASS+MELODY+FX) play from start to finish. Good for loop-style use or when you just want a long piece of material.<br><br>
+      <strong style="color:var(--text);">Triple Drop</strong>: intro (FX only) → [buildup (BASS+FX) → drop (all tracks) → break (MELODY+FX)] ×3 → outro (FX only) — the most sections (10). Lots of ups and downs, and it tends to run long, so even at 180 seconds each section stays fairly short. At 30 seconds, some sections (buildup/break) shrink to the 1-bar minimum — sometimes under a second depending on BPM — making the arrangement feel very rushed. For short lengths, "Two Drop" or "Nonstop" work better.<br><br>
+      <strong style="color:var(--text);">Verse-Chorus</strong>: intro (FX only) → verse (DRUM+BASS) → chorus (all tracks) → verse (DRUM+BASS) → chorus (all tracks) → bridge (MELODY+FX) → chorus (all tracks) → outro (FX only), 8 sections. Built around a verse→chorus arc more familiar from rock/pop than EDM's build/drop.<br><br>
+      <strong style="color:var(--text);">Verse-Hook</strong>: just verse (DRUM+BASS) → hook (all tracks), repeated 3 times (a short 4-bar FX-only intro, no dedicated outro or bridge). Modeled more on hip-hop, where the loop carries the track and the hook rotates in and out rather than a big EDM-style arc.<br><br>
+      <u>For both Verse-Chorus and Verse-Hook, use a one-bar drum loop for DRUM (kick + snare etc. already arranged) rather than a single one-shot.</u> The one-shot feature retriggers the same sound every beat, which works for four-on-the-floor kicks but can't produce a real backbeat pattern with separate kick and snare hits.
+    `,
+    warnExt: 'unsupported format (wav/mp3 only)',
+    warnSize: 'over 20MB',
+    warnDuration: 'over 30s',
+    warnCount: (n) => `max ${n} file(s) per track`,
+    warnPrefix: 'Excluded: ',
+    logPreparing: 'Preparing...',
+    logDecoding: (label) => `${label}: decoding...`,
+    logNoDecode: (label) => `  [Warning] ${label}: no source could be decoded (this track will be skipped)`,
+    logStretchApply: (label, detected, confidence, bpm) => `  ${label}: detected ${detected} BPM (confidence ${confidence}%) → stretching to ${bpm}...`,
+    logNoStretch: (label, reason, detected) => `  ${label}: no correction (${reason}${detected ? ', detected '+detected : ''})`,
+    reasonNoDetect: 'tempo undetectable',
+    reasonLowConf: (c) => `low confidence (${c}%)`,
+    reasonSameBpm: 'already close to target BPM',
+    logStretchFail: (label, msg) => `  [Warning] ${label}: tempo analysis failed, using uncorrected (${msg})`,
+    logOneShot: (label) => `  ${label}: detected as one-shot → retriggering per beat/section`,
+    logOneShotFail: (label, msg) => `  [Warning] ${label}: one-shot detection failed, treating as a loop (${msg})`,
+    logSkipped: (labels) => `[Skipped] ${labels}: empty, not used`,
+    errNoTracks: 'No track has a source loaded. Add at least one.',
+    errAllDecodeFailed: 'All sources failed to decode. Please check the file format (WAV/MP3) or whether the files are corrupted.',
+    logTarget: (target, actual, bpm) => `Target: ${target}s / Actual: about ${actual}s (due to bar rounding at ${bpm} BPM)`,
+    logSection: (name, bars, dur, silent) => `[${name}] ${bars} bars / ${dur}s${silent}`,
+    silentTag: ' (silent)',
+    logRendering: 'Rendering...',
+    logNearSilent: '[Warning] The generated audio is nearly silent. The uploaded sources may have failed to decode.',
+    logToWav: 'Encoding to WAV...',
+    logComplete: 'Done! Use the play button to preview.',
+    errPrefix: '[Error] ',
+    downloadErrPrefix: '[Download error] ',
+  },
+};
+function t(key, ...args){
+  const entry = TRANSLATIONS[currentLang][key];
+  return typeof entry === 'function' ? entry(...args) : entry;
+}
+
+function applyLanguage(lang){
+  currentLang = lang;
+  document.getElementById('taglineText').textContent = t('tagline');
+  document.getElementById('stepLabel1').textContent = t('stepLabel1');
+  document.getElementById('stepLabel2').textContent = t('stepLabel2');
+  document.getElementById('stepLabel3').textContent = t('stepLabel3');
+  document.getElementById('labelTrackName').textContent = t('labelTrackName');
+  document.getElementById('labelDuration').textContent = t('labelDuration');
+  document.getElementById('labelPattern').textContent = t('labelPattern');
+  document.getElementById('labelSidechain').textContent = t('labelSidechain');
+  document.getElementById('labelDownloadFormat').textContent = t('labelDownloadFormat');
+  downloadBtn.textContent = t('downloadBtnDefault');
+  for (let i = 1; i <= 8; i++){
+    const el = document.getElementById('note' + i);
+    if (el) el.innerHTML = t('note' + i);
+  }
+  document.querySelectorAll('.slot-sub').forEach(el => el.innerHTML = t('slotSubHtml'));
+  document.querySelectorAll('.dz-text').forEach(el => el.innerHTML = t('dzTextHtml'));
+  document.querySelectorAll('.slot-volume-label').forEach(el => el.textContent = t('slotVolumeLabel'));
+  document.querySelectorAll('.pattern-btn').forEach(btn => { btn.textContent = PATTERN_LABELS[lang][btn.dataset.value]; });
+  if (!logTouched) logEl.textContent = t('logPlaceholder');
+  updateGenerateButtonState();
+}
+
+const langButtons = document.querySelectorAll('.lang-btn');
+langButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    langButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyLanguage(btn.dataset.value);
+  });
+});
+
+const store = {drum:[], bass:[], melody:[], fx:[]};
+const trackVolume = {drum:1, bass:1, melody:1, fx:1};
+const slotsEl = document.getElementById('slots');
+const logEl = document.getElementById('log');
+const generateBtn = document.getElementById('generateBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const resultEl = document.getElementById('result');
+const player = document.getElementById('player');
+
+let lastRender = null; // { buffer, wavBlob }
+let logTouched = false;
+
+function log(msg){
+  logTouched = true;
+  logEl.textContent += '\n' + msg;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+function resetLog(msg){ logTouched = true; logEl.textContent = msg; }
+
+const bpmSlider = document.getElementById('bpm');
+const bpmValueEl = document.getElementById('bpmValue');
+bpmSlider.addEventListener('input', () => { bpmValueEl.textContent = bpmSlider.value; });
+
+const durationSlider = document.getElementById('duration');
+const durationValueEl = document.getElementById('durationValue');
+durationSlider.addEventListener('input', () => { durationValueEl.textContent = durationSlider.value; });
+
+let selectedPattern = 'classic';
+const patternButtons = document.querySelectorAll('.pattern-btn');
+patternButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    patternButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedPattern = btn.dataset.value;
+  });
+});
+
+let sidechainOn = false;
+const sidechainButtons = document.querySelectorAll('.sidechain-btn');
+sidechainButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    sidechainButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sidechainOn = btn.dataset.value === 'on';
+  });
+});
+
+let selectedFormat = 'wav';
+const formatButtons = document.querySelectorAll('.format-btn');
+formatButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    formatButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedFormat = btn.dataset.value;
+  });
+});
+
+function updateGenerateButtonState(){
+  const missing = CATEGORIES.filter(cat => store[cat.key].length === 0).map(c => c.label);
+  generateBtn.disabled = missing.length > 0;
+  generateBtn.textContent = missing.length > 0
+    ? t('generateBtnMissing', missing.join(' / '))
+    : t('generateBtnDefault');
+}
+generateBtn.disabled = true;
+
+CATEGORIES.forEach(cat => {
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  slot.id = 'slot-' + cat.key;
+  slot.innerHTML = `
+    <div class="slot-name">${cat.label}</div>
+    <div class="slot-sub">WAV / MP3<br>（20MBまで・30秒以内）</div>
+    <label class="dropzone">
+      <span class="dz-text">ファイルを選択<br>（1ファイルのみ）</span>
+      <input type="file" accept=".wav,.mp3,audio/wav,audio/mpeg,audio/wave,audio/x-wav">
+    </label>
+    <ul class="filelist"></ul>
+    <canvas class="slot-waveform" width="260" height="36" style="display:none; width:100%; height:36px; background:var(--bg); border:1px solid var(--line);"></canvas>
+    <div class="slot-volume-row" style="display:flex; align-items:center; gap:6px;">
+      <label class="slot-volume-label" style="font-size:10px; color:var(--dim); white-space:nowrap;">音量</label>
+      <input type="range" class="slot-volume" min="0" max="150" value="100" style="flex:1; height:3px;">
+      <span class="slot-volume-value" style="font-size:10px; color:var(--dim); min-width:34px; text-align:right;">100%</span>
+    </div>
+    <p class="slot-warn" style="display:none; color:var(--danger); font-size:11px; margin:0;"></p>
+  `;
+  slotsEl.appendChild(slot);
+  const input = slot.querySelector('input[type=file]');
+  const list = slot.querySelector('.filelist');
+  const warn = slot.querySelector('.slot-warn');
+  const waveformCanvas = slot.querySelector('.slot-waveform');
+  const volumeSlider = slot.querySelector('.slot-volume');
+  const volumeValueEl = slot.querySelector('.slot-volume-value');
+  volumeSlider.addEventListener('input', () => {
+    volumeValueEl.textContent = volumeSlider.value + '%';
+    trackVolume[cat.key] = parseInt(volumeSlider.value, 10) / 100;
+  });
+  const MAX_BYTES = 20 * 1024 * 1024;
+  const MAX_SEC = 30;
+  const MAX_COUNT = 1;
+
+  function probeDuration(file){
+    return new Promise((resolve) => {
+      try{
+        const url = URL.createObjectURL(file);
+        const audio = new Audio();
+        let done = false;
+        const cleanup = () => { try{ URL.revokeObjectURL(url); }catch(e){} };
+        const finish = (val) => { if (done) return; done = true; clearTimeout(timer); cleanup(); resolve(val); };
+        const timer = setTimeout(() => finish(null), 5000);
+        audio.addEventListener('loadedmetadata', () => {
+          const d = audio.duration;
+          finish(Number.isFinite(d) ? d : null);
+        });
+        audio.addEventListener('error', () => finish(null));
+        audio.src = url;
+      }catch(e){
+        resolve(null);
+      }
+    });
+  }
+
+  input.addEventListener('change', async () => {
+    try{
+      const all = Array.from(input.files);
+      const extOk = all.filter(f => /\.(wav|mp3)$/i.test(f.name));
+      const extRejected = all.filter(f => !/\.(wav|mp3)$/i.test(f.name));
+      const sizeOk = extOk.filter(f => f.size <= MAX_BYTES);
+      const sizeRejected = extOk.filter(f => f.size > MAX_BYTES);
+
+      list.innerHTML = `<li>${t('checkingLabel')}</li>`;
+      const durations = await Promise.all(sizeOk.map(probeDuration));
+      const finalOk = [];
+      const durationRejected = [];
+      sizeOk.forEach((f, i) => {
+        if (durations[i] === null || durations[i] <= MAX_SEC) finalOk.push(f);
+        else durationRejected.push(f);
+      });
+
+      store[cat.key] = finalOk.slice(0, MAX_COUNT);
+      const countRejected = finalOk.slice(MAX_COUNT);
+      list.innerHTML = store[cat.key].map(f => `<li>${f.name}</li>`).join('');
+      slot.classList.toggle('has-files', store[cat.key].length > 0);
+
+      if (store[cat.key].length > 0){
+        waveformCanvas.style.display = 'block';
+        drawWaveformPreview(waveformCanvas, store[cat.key][0]);
+      } else {
+        waveformCanvas.style.display = 'none';
+      }
+
+      const reasons = [];
+      if (extRejected.length) reasons.push(`${extRejected.map(f=>f.name).join(', ')}（${t('warnExt')}）`);
+      if (sizeRejected.length) reasons.push(`${sizeRejected.map(f=>f.name).join(', ')}（${t('warnSize')}）`);
+      if (durationRejected.length) reasons.push(`${durationRejected.map(f=>f.name).join(', ')}（${t('warnDuration')}）`);
+      if (countRejected.length) reasons.push(`${countRejected.map(f=>f.name).join(', ')}（${t('warnCount', MAX_COUNT)}）`);
+      if (reasons.length){
+        warn.style.display = 'block';
+        warn.textContent = t('warnPrefix') + reasons.join(' / ');
+      } else {
+        warn.style.display = 'none';
+      }
+      updateGenerateButtonState();
+    }catch(e){
+      list.innerHTML = '';
+      warn.style.display = 'block';
+      warn.textContent = t('warnPrefix') + (e && e.message ? e.message : String(e));
+      updateGenerateButtonState();
+    }
+  });
+});
+
+function pickRandom(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+// --- 波形描画（アップロード時のプレビューと、完成後の表示の両方で共有） ---
+function renderWaveformFromBuffer(canvas, audioBuf){
+  const ctx2d = canvas.getContext('2d');
+  ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+  const data = audioBuf.getChannelData(0);
+  const w = canvas.width, h = canvas.height, mid = h / 2;
+  const step = Math.max(1, Math.floor(data.length / w));
+  ctx2d.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--acid').trim() || '#c6ff3a';
+  ctx2d.lineWidth = 1;
+  ctx2d.beginPath();
+  for (let x = 0; x < w; x++){
+    let min = 1, max = -1;
+    const start = x * step;
+    for (let i = 0; i < step && start + i < data.length; i++){
+      const v = data[start + i];
+      if (v < min) min = v;
+      if (v > max) max = v;
+    }
+    ctx2d.moveTo(x, mid + min * mid * 0.9);
+    ctx2d.lineTo(x, mid + max * mid * 0.9);
+  }
+  ctx2d.stroke();
+}
+
+let previewCtx = null;
+async function drawWaveformPreview(canvas, file){
+  const ctx2d = canvas.getContext('2d');
+  ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+  try{
+    if (!previewCtx) previewCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const arrBuf = await file.arrayBuffer();
+    const audioBuf = await previewCtx.decodeAudioData(arrBuf.slice(0));
+    renderWaveformFromBuffer(canvas, audioBuf);
+  }catch(e){
+    ctx2d.fillStyle = '#666';
+    ctx2d.font = '10px monospace';
+    ctx2d.fillText(t('waveformError'), 6, canvas.height / 2 + 3);
+  }
+}
+
+// --- WSOLA によるピッチ保持タイムストレッチ（外部依存なし） ---
+function hannWindow(n){
+  const w = new Float32Array(n);
+  for (let i = 0; i < n; i++) w[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (n - 1));
+  return w;
+}
+
+function computeFrameOffsets(ref, inputLen, seekWindow, overlap, hopA, searchRadius){
+  const offsets = [];
+  let readPos = 0;
+  let prevTail = null;
+  while (readPos + seekWindow <= inputLen){
+    let bestOffset = 0;
+    if (prevTail){
+      let bestScore = Infinity;
+      const rangeStart = Math.max(0, readPos - searchRadius);
+      const rangeEnd = Math.min(inputLen - seekWindow, readPos + searchRadius);
+      for (let cand = rangeStart; cand <= rangeEnd; cand++){
+        let score = 0;
+        for (let i = 0; i < overlap; i++){
+          const d = prevTail[i] - ref[cand + i];
+          score += d * d;
+        }
+        if (score < bestScore){ bestScore = score; bestOffset = cand - readPos; }
+      }
+    }
+    const frameStart = readPos + bestOffset;
+    offsets.push(frameStart);
+    prevTail = ref.slice(frameStart + seekWindow - overlap, frameStart + seekWindow);
+    readPos += hopA;
+  }
+  return offsets;
+}
+
+function synthesizeChannel(data, offsets, seekWindow, hopS, win, outputLen){
+  const output = new Float32Array(outputLen);
+  const weight = new Float32Array(outputLen);
+  let writePos = 0;
+  for (const frameStart of offsets){
+    for (let i = 0; i < seekWindow; i++){
+      const idx = writePos + i;
+      if (idx >= outputLen) break;
+      output[idx] += data[frameStart + i] * win[i];
+      weight[idx] += win[i];
+    }
+    writePos += hopS;
+  }
+  for (let i = 0; i < outputLen; i++){
+    if (weight[i] > 1e-6) output[i] /= weight[i];
+  }
+  return output;
+}
+
+// stretchRatio = 出力尺 / 入力尺（source_bpm / target_bpm）。ピッチは変えない。
+function timeStretchBuffer(audioBuffer, stretchRatio){
+  const seekWindow = 2048;
+  const overlap = 512;
+  const hopA = seekWindow - overlap;
+  const hopS = Math.max(1, Math.round(hopA * stretchRatio));
+  const searchRadius = 128;
+  const win = hannWindow(seekWindow);
+
+  const numCh = audioBuffer.numberOfChannels;
+  const inputLen = audioBuffer.length;
+  const ref = new Float32Array(inputLen);
+  for (let c = 0; c < numCh; c++){
+    const chan = audioBuffer.getChannelData(c);
+    for (let i = 0; i < inputLen; i++) ref[i] += chan[i] / numCh;
+  }
+  const offsets = computeFrameOffsets(ref, inputLen, seekWindow, overlap, hopA, searchRadius);
+  const outputLen = offsets.length ? (offsets.length - 1) * hopS + seekWindow : 1;
+
+  const outBuffer = new AudioBuffer({ numberOfChannels: numCh, length: outputLen, sampleRate: audioBuffer.sampleRate });
+  for (let c = 0; c < numCh; c++){
+    const chan = audioBuffer.getChannelData(c);
+    const synth = synthesizeChannel(chan, offsets, seekWindow, hopS, win, outputLen);
+    outBuffer.copyToChannel(synth, c);
+  }
+  return outBuffer;
+}
+
+// --- 自己相関による自動BPM検出（ファイル名にも手入力にも依存しない） ---
+function detectBpm(audioBuffer){
+  const sr = audioBuffer.sampleRate;
+  const numCh = audioBuffer.numberOfChannels;
+  const len = audioBuffer.length;
+  const mono = new Float32Array(len);
+  for (let c = 0; c < numCh; c++){
+    const d = audioBuffer.getChannelData(c);
+    for (let i = 0; i < len; i++) mono[i] += d[i] / numCh;
+  }
+
+  const hop = 512, frameSize = 1024;
+  const numFrames = Math.floor((len - frameSize) / hop) + 1;
+  if (numFrames < 8) return { bpm: null, confidence: 0 };
+
+  const energy = new Float32Array(numFrames);
+  for (let f = 0; f < numFrames; f++){
+    let sum = 0;
+    const start = f * hop;
+    for (let i = 0; i < frameSize; i++){ const s = mono[start + i]; sum += s * s; }
+    energy[f] = Math.sqrt(sum / frameSize);
+  }
+  const onset = new Float32Array(numFrames);
+  for (let f = 1; f < numFrames; f++) onset[f] = Math.max(0, energy[f] - energy[f - 1]);
+
+  const frameRate = sr / hop;
+  const minBpm = 40, maxBpm = 300;
+  const lagMin = Math.max(1, Math.round(frameRate * 60 / maxBpm));
+  const lagMax = Math.min(numFrames - 1, Math.round(frameRate * 60 / minBpm));
+  if (lagMax <= lagMin) return { bpm: null, confidence: 0 };
+
+  let bestLag = lagMin, bestScore = -Infinity;
+  const scores = new Float32Array(lagMax - lagMin + 1);
+  for (let lag = lagMin; lag <= lagMax; lag++){
+    let sum = 0, n = 0;
+    for (let i = 0; i + lag < numFrames; i++){ sum += onset[i] * onset[i + lag]; n++; }
+    const score = n > 0 ? sum / n : 0;
+    scores[lag - lagMin] = score;
+    if (score > bestScore){ bestScore = score; bestLag = lag; }
+  }
+
+  // オクターブ誤り対策: より短い周期（＝速いBPM）でも十分強いピークがあれば、
+  // そちらを本来の拍と判断する（自己相関は周期の整数倍でも強く出るため）
+  let chosenLag = bestLag;
+  for (let lag = lagMin; lag < bestLag; lag++){
+    if (scores[lag - lagMin] >= 0.6 * bestScore){ chosenLag = lag; break; }
+  }
+  bestLag = chosenLag;
+
+  // 放物線補間でサブフレーム精度に寄せる
+  const idx = bestLag - lagMin;
+  let refinedLag = bestLag;
+  if (idx > 0 && idx < scores.length - 1){
+    const y0 = scores[idx - 1], y1 = scores[idx], y2 = scores[idx + 1];
+    const denom = y0 - 2 * y1 + y2;
+    if (Math.abs(denom) > 1e-9){
+      const delta = 0.5 * (y0 - y2) / denom;
+      refinedLag = bestLag + Math.max(-1, Math.min(1, delta));
+    }
+  }
+  const bpm = (frameRate * 60) / refinedLag;
+
+  let onsetEnergy = 0;
+  for (let i = 0; i < numFrames; i++) onsetEnergy += onset[i] * onset[i];
+  const norm = onsetEnergy / numFrames;
+  const confidence = norm > 1e-9 ? Math.max(0, Math.min(1, bestScore / norm)) : 0;
+
+  return { bpm: Math.round(bpm * 10) / 10, confidence };
+}
+
+// --- ワンショット判定（末尾が大きく減衰しているか） ---
+function isOneShot(audioBuffer){
+  const numCh = audioBuffer.numberOfChannels;
+  const len = audioBuffer.length;
+  const mono = new Float32Array(len);
+  for (let c = 0; c < numCh; c++){
+    const d = audioBuffer.getChannelData(c);
+    for (let i = 0; i < len; i++) mono[i] += d[i] / numCh;
+  }
+  const segments = 10;
+  const segLen = Math.floor(len / segments);
+  if (segLen < 1) return false;
+  const rms = [];
+  for (let s = 0; s < segments; s++){
+    let sum = 0;
+    const start = s * segLen;
+    for (let i = 0; i < segLen; i++){ const v = mono[start + i]; sum += v * v; }
+    rms.push(Math.sqrt(sum / segLen));
+  }
+  const peak = Math.max(...rms);
+  const tail = rms[rms.length - 1];
+  if (peak < 1e-6) return false;
+  return tail / peak < 0.15; // 末尾が最大音量の15%未満まで減衰 = 単発の打撃音とみなす
+}
+
+// --- Web Audio 処理 ---
+async function decodeFiles(ctx, files){
+  const buffers = [];
+  for (const f of files){
+    const arr = await f.arrayBuffer();
+    try{
+      const buf = await ctx.decodeAudioData(arr.slice(0));
+      buffers.push(buf);
+    }catch(e){
+      log(`  [警告] ${f.name} をデコードできませんでした`);
+    }
+  }
+  return buffers;
+}
+
+async function buildTrack(bpm, targetSeconds, sidechainOn, patternKey){
+  const SECTIONS = (PATTERNS[patternKey] || PATTERNS.classic).sections;
+  const probeCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const decoded = {};
+  const availableCats = CATEGORIES.filter(cat => store[cat.key].length > 0);
+  if (availableCats.length === 0){
+    throw new Error(t('errNoTracks'));
+  }
+  const CONFIDENCE_THRESHOLD = 0.15;
+  for (const cat of availableCats){
+    log(t('logDecoding', cat.label));
+    const decodedBufs = await decodeFiles(probeCtx, store[cat.key]);
+    if (decodedBufs.length === 0){
+      log(t('logNoDecode', cat.label));
+    }
+    const processed = [];
+    for (const buf of decodedBufs){
+      let finalBuf = buf;
+      try{
+        const { bpm: detected, confidence } = detectBpm(buf);
+        if (detected && confidence >= CONFIDENCE_THRESHOLD && Math.abs(detected - bpm) / bpm > 0.01){
+          log(t('logStretchApply', cat.label, detected, (confidence*100).toFixed(0), bpm));
+          finalBuf = timeStretchBuffer(buf, detected / bpm);
+        } else {
+          const reason = !detected ? t('reasonNoDetect') : confidence < CONFIDENCE_THRESHOLD ? t('reasonLowConf', (confidence*100).toFixed(0)) : t('reasonSameBpm');
+          log(t('logNoStretch', cat.label, reason, detected));
+        }
+      }catch(e){
+        log(t('logStretchFail', cat.label, e.message));
+        finalBuf = buf;
+      }
+      let oneShot = false;
+      try{
+        oneShot = isOneShot(finalBuf);
+        if (oneShot) log(t('logOneShot', cat.label));
+      }catch(e){
+        log(t('logOneShotFail', cat.label, e.message));
+      }
+      processed.push({ buffer: finalBuf, oneShot });
+    }
+    decoded[cat.key] = processed;
+  }
+  await probeCtx.close();
+  const skipped = CATEGORIES.filter(cat => store[cat.key].length === 0).map(c => c.label);
+  if (skipped.length) log(t('logSkipped', skipped.join(' / ')));
+
+  const totalUsable = Object.values(decoded).reduce((sum, arr) => sum + arr.length, 0);
+  if (totalUsable === 0){
+    throw new Error(t('errAllDecodeFailed'));
+  }
+
+  const secPerBar = 4 * 60 / bpm;
+
+  // 各セクションの「元の比率」を保ったまま、狙った秒数に合う小節数へスケーリングする
+  // (小節は整数なので、BPMによっては数秒の誤差が出る)
+  const totalWeight = SECTIONS.reduce((s, sec) => s + sec.bars, 0);
+  let targetBars = Math.max(SECTIONS.length, Math.round(targetSeconds / secPerBar));
+  let scaledBars = SECTIONS.map(sec => Math.max(1, Math.round(targetBars * sec.bars / totalWeight)));
+  let diff = targetBars - scaledBars.reduce((a, b) => a + b, 0);
+  if (diff !== 0){
+    const idx = scaledBars.indexOf(Math.max(...scaledBars));
+    scaledBars[idx] = Math.max(1, scaledBars[idx] + diff);
+  }
+
+  let totalSec = 0;
+  const plan = SECTIONS.map((sec, i) => {
+    const bars = scaledBars[i];
+    const dur = bars * secPerBar;
+    totalSec += dur;
+    return {...sec, bars, dur};
+  });
+  log(t('logTarget', targetSeconds, totalSec.toFixed(1), bpm));
+
+  const sampleRate = 44100;
+  const offline = new OfflineAudioContext(2, Math.ceil(totalSec * sampleRate), sampleRate);
+  const master = offline.createGain();
+  master.gain.setValueAtTime(0, 0);
+  master.gain.linearRampToValueAtTime(1, 1.5);
+  master.gain.setValueAtTime(1, Math.max(0, totalSec - 1.5));
+  master.gain.linearRampToValueAtTime(0.0001, totalSec);
+
+  // マスターリミッター: 複数トラックの重なりによる音割れを防ぐ
+  const limiter = offline.createDynamicsCompressor();
+  limiter.threshold.setValueAtTime(-3, 0);
+  limiter.knee.setValueAtTime(0, 0);
+  limiter.ratio.setValueAtTime(20, 0);
+  limiter.attack.setValueAtTime(0.003, 0);
+  limiter.release.setValueAtTime(0.1, 0);
+  master.connect(limiter);
+  limiter.connect(offline.destination);
+
+  const secPerBeat = 60 / bpm;
+  let cursor = 0;
+  for (const sec of plan){
+    const usableCats = sec.categories.filter(catKey => decoded[catKey] && decoded[catKey].length > 0);
+    log(t('logSection', sec.name, sec.bars, sec.dur.toFixed(1), usableCats.length ? '' : t('silentTag')));
+    const layerGain = 1 / Math.max(1, usableCats.length) * 1.6;
+    for (const catKey of usableCats){
+      const picked = pickRandom(decoded[catKey]);
+      const g = offline.createGain();
+      g.gain.value = Math.min(1, layerGain) * (trackVolume[catKey] ?? 1);
+
+      // サイドチェイン: DRUMが同区間にあり、かつ自分がDRUM以外なら拍ごとにダッキングをかける
+      const applyDuck = sidechainOn && catKey !== 'drum' && usableCats.includes('drum');
+      let outNode = g;
+      if (applyDuck){
+        const duck = offline.createGain();
+        duck.gain.setValueAtTime(1, cursor);
+        const attack = 0.008;
+        const releaseTau = secPerBeat * 0.22;
+        const duckDepth = 0.22;
+        for (let t = 0; t < sec.dur; t += secPerBeat){
+          const hitTime = cursor + t;
+          duck.gain.setValueAtTime(1, hitTime);
+          duck.gain.linearRampToValueAtTime(duckDepth, hitTime + attack);
+          duck.gain.setTargetAtTime(1, hitTime + attack, releaseTau);
+        }
+        g.connect(duck);
+        outNode = duck;
+      }
+      outNode.connect(master);
+
+      if (picked.oneShot){
+        // ワンショット: ループさせず、拍ごとに単発で打ち直す（FXは区間の頭で1回だけ）
+        const interval = catKey === 'fx' ? sec.dur : secPerBeat;
+        for (let t = 0; t < sec.dur; t += interval){
+          const src = offline.createBufferSource();
+          src.buffer = picked.buffer;
+          src.connect(g);
+          src.start(cursor + t);
+        }
+      } else {
+        const src = offline.createBufferSource();
+        src.buffer = picked.buffer;
+        src.loop = true;
+        src.loopStart = 0;
+        src.loopEnd = picked.buffer.duration;
+        src.connect(g);
+        src.start(cursor);
+        src.stop(cursor + sec.dur);
+      }
+    }
+    cursor += sec.dur;
+  }
+
+  log(t('logRendering'));
+  const rendered = await offline.startRendering();
+
+  // 無音チェック（一部サンプルを抜き取って音量を確認）
+  let peak = 0;
+  const checkData = rendered.getChannelData(0);
+  for (let i = 0; i < checkData.length; i += 97){
+    const v = Math.abs(checkData[i]);
+    if (v > peak) peak = v;
+  }
+  if (peak < 0.001){
+    log(t('logNearSilent'));
+  }
+
+  log(t('logToWav'));
+  return { buffer: rendered, wavBlob: audioBufferToWavBlob(rendered) };
+}
+
+function audioBufferToWavBlob(buffer){
+  const numCh = buffer.numberOfChannels;
+  const len = buffer.length * numCh * 2 + 44;
+  const arrBuf = new ArrayBuffer(len);
+  const view = new DataView(arrBuf);
+  const writeStr = (offset, str) => { for (let i=0;i<str.length;i++) view.setUint8(offset+i, str.charCodeAt(i)); };
+
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + buffer.length * numCh * 2, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numCh, true);
+  view.setUint32(24, buffer.sampleRate, true);
+  view.setUint32(28, buffer.sampleRate * numCh * 2, true);
+  view.setUint16(32, numCh * 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, 'data');
+  view.setUint32(40, buffer.length * numCh * 2, true);
+
+  const channels = [];
+  for (let c=0;c<numCh;c++) channels.push(buffer.getChannelData(c));
+  let offset = 44;
+  for (let i=0;i<buffer.length;i++){
+    for (let c=0;c<numCh;c++){
+      let sample = Math.max(-1, Math.min(1, channels[c][i]));
+      sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+      view.setInt16(offset, sample, true);
+      offset += 2;
+    }
+  }
+  return new Blob([arrBuf], {type:'audio/wav'});
+}
+
+function floatTo16BitPCM(channelData){
+  const out = new Int16Array(channelData.length);
+  for (let i = 0; i < channelData.length; i++){
+    let s = Math.max(-1, Math.min(1, channelData[i]));
+    out[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+  }
+  return out;
+}
+
+function audioBufferToMp3Blob(buffer){
+  if (typeof lamejs === 'undefined'){
+    throw new Error('MP3エンコーダの読み込みに失敗しました（ネットワーク環境をご確認ください）');
+  }
+  const numCh = buffer.numberOfChannels;
+  const encoder = new lamejs.Mp3Encoder(numCh, buffer.sampleRate, 192);
+  const blockSize = 1152;
+  const chunks = [];
+
+  if (numCh === 1){
+    const pcm = floatTo16BitPCM(buffer.getChannelData(0));
+    for (let i = 0; i < pcm.length; i += blockSize){
+      const chunk = pcm.subarray(i, i + blockSize);
+      const enc = encoder.encodeBuffer(chunk);
+      if (enc.length > 0) chunks.push(enc);
+    }
+  } else {
+    const left = floatTo16BitPCM(buffer.getChannelData(0));
+    const right = floatTo16BitPCM(buffer.getChannelData(1));
+    for (let i = 0; i < left.length; i += blockSize){
+      const l = left.subarray(i, i + blockSize);
+      const r = right.subarray(i, i + blockSize);
+      const enc = encoder.encodeBuffer(l, r);
+      if (enc.length > 0) chunks.push(enc);
+    }
+  }
+  const end = encoder.flush();
+  if (end.length > 0) chunks.push(end);
+  return new Blob(chunks, {type:'audio/mp3'});
+}
+
+// --- 最小限のZIP書き出し（無圧縮 / store方式） ---
+function crc32(buf){
+  let c, crc = 0xFFFFFFFF;
+  const table = crc32.table || (crc32.table = (() => {
+    const t = [];
+    for (let n=0;n<256;n++){
+      c = n;
+      for (let k=0;k<8;k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[n] = c >>> 0;
+    }
+    return t;
+  })());
+  for (let i=0;i<buf.length;i++) crc = table[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+async function makeZip(filename, blob){
+  const data = new Uint8Array(await blob.arrayBuffer());
+  const nameBytes = new TextEncoder().encode(filename);
+  const crc = crc32(data);
+  const now = new Date();
+  const dosTime = ((now.getHours()&0x1F)<<11)|((now.getMinutes()&0x3F)<<5)|((now.getSeconds()/2)&0x1F);
+  const dosDate = (((now.getFullYear()-1980)&0x7F)<<9)|(((now.getMonth()+1)&0xF)<<5)|(now.getDate()&0x1F);
+
+  function u16(v){ return [v & 0xFF, (v>>8)&0xFF]; }
+  function u32(v){ return [v&0xFF,(v>>8)&0xFF,(v>>16)&0xFF,(v>>24)&0xFF]; }
+
+  const localHeader = new Uint8Array([
+    0x50,0x4B,0x03,0x04, 20,0, 0,0, 0,0,
+    ...u16(dosTime), ...u16(dosDate),
+    ...u32(crc), ...u32(data.length), ...u32(data.length),
+    ...u16(nameBytes.length), 0,0,
+  ]);
+  const centralHeader = new Uint8Array([
+    0x50,0x4B,0x01,0x02, 20,0, 20,0, 0,0, 0,0,
+    ...u16(dosTime), ...u16(dosDate),
+    ...u32(crc), ...u32(data.length), ...u32(data.length),
+    ...u16(nameBytes.length), 0,0, 0,0, 0,0, 0,0,
+    ...u32(0), ...u32(0),
+  ]);
+  const localOffset = 0;
+  const localBlockSize = localHeader.length + nameBytes.length + data.length;
+  const endRecord = new Uint8Array([
+    0x50,0x4B,0x05,0x06, 0,0,0,0,
+    ...u16(1), ...u16(1),
+    ...u32(centralHeader.length + nameBytes.length),
+    ...u32(localBlockSize),
+    0,0,
+  ]);
+
+  return new Blob([
+    localHeader, nameBytes, data,
+    centralHeader, nameBytes,
+    endRecord,
+  ], {type:'application/zip'});
+}
+
+generateBtn.addEventListener('click', async () => {
+  resetLog(t('logPreparing'));
+  generateBtn.disabled = true;
+  resultEl.classList.remove('show');
+  try{
+    const bpm = parseInt(document.getElementById('bpm').value, 10) || 120;
+    const targetSeconds = parseInt(durationSlider.value, 10) || 150;
+    lastRender = await buildTrack(bpm, targetSeconds, sidechainOn, selectedPattern);
+    const url = URL.createObjectURL(lastRender.wavBlob);
+    player.src = url;
+    const resultWaveform = document.getElementById('resultWaveform');
+    resultWaveform.style.display = 'block';
+    renderWaveformFromBuffer(resultWaveform, lastRender.buffer);
+    const displayName = document.getElementById('trackName').value.trim() || 'loop-arranger-session';
+    document.getElementById('completedTrackName').textContent = t('completedNamePrefix', displayName);
+    resultEl.classList.add('show');
+    log(t('logComplete'));
+  }catch(err){
+    log(t('errPrefix') + err.message);
+  }finally{
+    generateBtn.disabled = false;
+  }
+});
+
+downloadBtn.addEventListener('click', async () => {
+  if (!lastRender) return;
+  downloadBtn.disabled = true;
+  const originalText = downloadBtn.textContent;
+  try{
+    const rawName = document.getElementById('trackName').value.trim() || 'loop-arranger-session';
+    const safeName = rawName.replace(/[\\/:*?"<>|]/g, '').trim() || 'loop-arranger-session';
+
+    let fileBlob, fileName;
+    if (selectedFormat === 'mp3'){
+      downloadBtn.textContent = t('downloadBtnConverting');
+      fileBlob = audioBufferToMp3Blob(lastRender.buffer);
+      fileName = `${safeName}.mp3`;
+    } else {
+      fileBlob = lastRender.wavBlob;
+      fileName = `${safeName}.wav`;
+    }
+
+    let downloads = null;
+    if (typeof claude !== 'undefined' && claude && typeof claude.use === 'function'){
+      try{ downloads = await claude.use('downloads'); }catch(e){ downloads = null; }
+    }
+    if (!downloads){
+      // claude.ai以外（GitHub Pages等の単独サイト）では拡張子そのままで直接ダウンロードできる
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(fileBlob);
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } else {
+      // claude.aiのdownloads機能はwav/mp3の拡張子を許可していないため、zipに包んで渡す
+      const zipBlob = await makeZip(fileName, fileBlob);
+      await downloads.save({filename:`${safeName}.zip`, data: zipBlob});
+    }
+  }catch(err){
+    log(t('downloadErrPrefix') + (err && err.message ? err.message : err));
+  }finally{
+    downloadBtn.disabled = false;
+    downloadBtn.textContent = originalText;
+  }
+});
+</script>
+</body>
+</html>
