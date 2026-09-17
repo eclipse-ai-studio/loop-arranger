@@ -42,7 +42,7 @@ h1{
   margin:0 0 8px; letter-spacing:-0.02em;
   text-shadow:0 0 8px rgba(198,255,58,.5), 0 0 26px rgba(198,255,58,.25);
 }
-.tagline{color:var(--dim); max-width:56ch; margin:0;}
+.tagline{color:var(--dim); max-width:90ch; margin:0;}
 .bar{
   display:flex; align-items:flex-end; gap:3px; height:28px; margin:20px 0 0;
 }
@@ -167,7 +167,7 @@ footer{
   </div>
   <header>
     <h1>LOOP ARRANGER</h1>
-    <p class="tagline" id="taglineText">DRUM / BASS / MELODY / FX の4トラックを放り込んで、設定した構成の曲に自動で組み上げる。処理はすべてこのブラウザの中で完結し、ファイルはどこにもアップロードされません。</p>
+    <p class="tagline" id="taglineText">DRUM / BASS / MELODY / FX の4トラックを放り込んで、設定した構成の曲に自動で組み上げる。<br><br>処理はすべてこのブラウザの中で完結し、ファイルはどこにもアップロードされません。</p>
     <div class="bar"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   </header>
 
@@ -344,7 +344,7 @@ const PATTERN_LABELS = {
 };
 const TRANSLATIONS = {
   ja: {
-    tagline: 'DRUM / BASS / MELODY / FX の4トラックを放り込んで、設定した構成の曲に自動で組み上げる。処理はすべてこのブラウザの中で完結し、ファイルはどこにもアップロードされません。',
+    tagline: 'DRUM / BASS / MELODY / FX の4トラックを放り込んで、設定した構成の曲に自動で組み上げる。<br><br>処理はすべてこのブラウザの中で完結し、ファイルはどこにもアップロードされません。',
     stepLabel1: '01 — 素材を4つ入れる（ループ、ワンショット）',
     stepLabel2: '02 — 設定を選んで「作成する」を押す',
     stepLabel3: '03 — 完成',
@@ -413,7 +413,7 @@ const TRANSLATIONS = {
     downloadErrPrefix: '[ダウンロードエラー] ',
   },
   en: {
-    tagline: 'Drop in 4 tracks — DRUM / BASS / MELODY / FX — and it auto-arranges them into a track using the structure you choose. Everything runs in this browser; nothing is ever uploaded anywhere.',
+    tagline: 'Drop in 4 tracks — DRUM / BASS / MELODY / FX — and it auto-arranges them into a track using the structure you choose.<br><br>Everything runs in this browser; nothing is ever uploaded anywhere.',
     stepLabel1: '01 — Add 4 tracks (loops or one-shots)',
     stepLabel2: '02 — Pick settings, then press "Generate"',
     stepLabel3: '03 — Done',
@@ -489,7 +489,7 @@ function t(key, ...args){
 
 function applyLanguage(lang){
   currentLang = lang;
-  document.getElementById('taglineText').textContent = t('tagline');
+  document.getElementById('taglineText').innerHTML = t('tagline');
   document.getElementById('stepLabel1').textContent = t('stepLabel1');
   document.getElementById('stepLabel2').textContent = t('stepLabel2');
   document.getElementById('stepLabel3').textContent = t('stepLabel3');
